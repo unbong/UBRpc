@@ -21,5 +21,6 @@
         <module>ubrpc-demo-provider</module>
         <module>ubrpc-demo-api</module>
         <module>ubrpc-core</module>
+        <module>ubrpc-demo-consumer</module>
     </modules>
 </project>

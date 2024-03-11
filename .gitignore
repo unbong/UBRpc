@@ -36,3 +36,7 @@ build/
 *.class
 /ubrpc-demo-api/ubrpc-demo-api.iml
 **/target/
+**/ubrpc-consumer-unbong
+**/client_exec/**
+/ubrpc-comsumer-ubnong/
+/ubrpc-core/src/main/java/io/unbong/ubrpc/core/client_exec/
