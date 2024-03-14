@@ -32,4 +32,44 @@ public class UserServiceImpl implements UserService {
     public String findName(int id) {
         return "ubnong: " + System.currentTimeMillis();
     }
+
+    @Override
+    public User findByid(User user) {
+        return new User(100, "ubnong  findByid(User user): " + System.currentTimeMillis());
+    }
+
+    @Override
+    public User find(int id, String name) {
+        return new User(100, "ubnong  findByid(int id, String name): " + System.currentTimeMillis());
+    }
+
+    @Override
+    public String getName() {
+        return "getName()";
+    }
+
+    @Override
+    public String getName(int id) {
+        return "getName(int id)";
+    }
+
+    @Override
+    public long getId(long id) {
+        return 2024L;
+    }
+
+    @Override
+    public long getId(float id) {
+        return (long) ((long)100L+id);
+    }
+
+    @Override
+    public long getId(User user) {
+        return Long.valueOf(user.getId());
+    }
+
+    @Override
+    public long[] getIds(long[] ids) {
+        return ids;
+    }
 }

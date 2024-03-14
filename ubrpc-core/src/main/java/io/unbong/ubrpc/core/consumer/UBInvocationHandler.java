@@ -1,12 +1,16 @@
 package io.unbong.ubrpc.core.consumer;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
+import io.unbong.ubrpc.core.util.MethodUtil;
+import io.unbong.ubrpc.core.util.TypeUtils;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -53,18 +57,14 @@ public class UBInvocationHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         // 过滤Object对象的方法不去调用
-        for(Method objMethod : Object.class.getMethods())
-        {
-            if(method.getName().equals(objMethod.getName()) )
-            {
-                return null;
-            }
+        if(MethodUtil.checkLocalMethod(method)){
+            return null;
         }
 
 
         RpcRequest rpcRequest = new RpcRequest();
         rpcRequest.setService(service.getCanonicalName());
-        rpcRequest.setMethod(method.getName());
+        rpcRequest.setMethodSign(MethodUtil.method(method));
         rpcRequest.setArgs(args);
 
         RpcResponse rpcResponse = post(rpcRequest);
@@ -72,14 +72,27 @@ public class UBInvocationHandler implements InvocationHandler {
         if(rpcResponse.isStatus()){
 
             Object rpcData =  rpcResponse.getData();
+
             if(rpcData instanceof JSONObject)
             {
                 JSONObject data = (JSONObject)rpcData;
                 return data.toJavaObject(method.getReturnType());
+            }else if(rpcData instanceof JSONArray jsonArray)
+            {
+                // 数组类型的反序列化操作
+                Object[] array = jsonArray.toArray();
+                // 返回数组的类型 仅仅是类型
+                Class<?> componentType = method.getReturnType().getComponentType();
+
+                Object resultArray  = Array.newInstance(componentType, array.length);
+                for (int i = 0; i < array.length; i++) {
+                    Array.set(resultArray, i, array[i]);
+                }
+                return resultArray;
             }
 
             // ub JSONObject to
-            return  rpcData;
+            return  TypeUtils.cast(rpcData, method.getReturnType());
         }
         else{
             Exception ex = rpcResponse.getException();

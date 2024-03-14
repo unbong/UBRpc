@@ -11,7 +11,7 @@ import lombok.Data;
 public class RpcRequest {
 
     String service;    //io.unbong.ubrpc.demo.api.UserService
-    String method;
+    String methodSign;
 
     Object[] args;
 }
