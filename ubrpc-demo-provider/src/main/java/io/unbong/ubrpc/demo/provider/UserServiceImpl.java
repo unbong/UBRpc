@@ -3,7 +3,14 @@ package io.unbong.ubrpc.demo.provider;
 import io.unbong.ubrpc.core.annotation.UbProvider;
 import io.unbong.ubrpc.demo.api.User;
 import io.unbong.ubrpc.demo.api.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * todo
@@ -13,6 +20,9 @@ import org.springframework.stereotype.Component;
 @Component
 @UbProvider
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    Environment environment;
     @Override
     public User findById(int id) {
 
@@ -20,7 +30,8 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("404 exception");
         }
 
-        return new User(100, "ubnong: " + System.currentTimeMillis());
+        return new User(100, "ubnong: " +environment.getProperty("server.port")
+                + "_" + System.currentTimeMillis());
     }
 
     @Override
@@ -72,4 +83,16 @@ public class UserServiceImpl implements UserService {
     public long[] getIds(long[] ids) {
         return ids;
     }
+
+    @Override
+    public List<Long> getIds(List<Long> ids) {
+
+        return ids;
+    }
+
+    @Override
+    public Map<String, User> getUsers(Map<String, User> users) {
+        return users;
+    }
+
 }

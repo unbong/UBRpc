@@ -1,10 +1,16 @@
 package io.unbong.ubrpc.core.consumer;
 
 import io.unbong.ubrpc.core.annotation.UBConsumer;
+import io.unbong.ubrpc.core.api.LoadBalancer;
+import io.unbong.ubrpc.core.api.Router;
+import io.unbong.ubrpc.core.api.RpcContext;
 import lombok.Data;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -20,9 +26,10 @@ import java.util.Map;
  * 2024-03-10 20:47
  */
 @Data
-public class ConsumerBootStrap implements ApplicationContextAware {
+public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAware {
 
     ApplicationContext _applicatoinContext ;
+    Environment _environment;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -36,11 +43,26 @@ public class ConsumerBootStrap implements ApplicationContextAware {
      * 执行自定义的依赖注入
      */
     public void start(){
+
+        Router router = _applicatoinContext.getBean(Router.class);
+        LoadBalancer loadBalancer = _applicatoinContext.getBean(LoadBalancer.class);
+
+        String urls = _environment.getProperty("ubrpc.providers","");
+        if(Strings.isEmpty(urls))
+        {
+            System.out.println("ubrpc.provider is empty.");
+        }
+        String[] providers = urls.split(",");
+
+
         String[] names = _applicatoinContext.getBeanDefinitionNames();
         for(String name : names){
             Object bean = _applicatoinContext.getBean(name);
             List<Field> fields = findAnnotatedField(bean.getClass());
 
+            RpcContext context = new RpcContext();
+            context.setRouter(router);
+            context.setLoadBalancer(loadBalancer);
             if(!name.contains("ubrpcDemoConsumerApplication")) continue;
             //　创建代理对象，并设定
 
@@ -50,7 +72,7 @@ public class ConsumerBootStrap implements ApplicationContextAware {
                     String serviceName = service.getCanonicalName();
                     Object consumer = stub.get(serviceName);
                     if(consumer == null){
-                        consumer = createConsumerProxy(service);
+                        consumer = createConsumerProxy(service, context, List.of(providers));
 
                     }
                     f.setAccessible(true);
@@ -66,13 +88,15 @@ public class ConsumerBootStrap implements ApplicationContextAware {
 
     /**
      * 通过 动态代理 bytebuddy
+     *
      * @param service
+     * @param providers
      * @return
      */
-    private Object createConsumerProxy(Class<?> service) {
+    private Object createConsumerProxy(Class<?> service, RpcContext context, List<String> providers) {
         return Proxy.newProxyInstance(service.getClassLoader(),
                 new Class[]{service}
-                , new UBInvocationHandler(service){}
+                , new UBInvocationHandler(service,  context, providers){}
 
         );
     }
@@ -94,5 +118,10 @@ public class ConsumerBootStrap implements ApplicationContextAware {
             aClass = aClass.getSuperclass();
         }
         return result;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        _environment= environment;
     }
 }

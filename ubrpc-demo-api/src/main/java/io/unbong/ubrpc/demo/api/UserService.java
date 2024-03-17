@@ -1,6 +1,8 @@
 package io.unbong.ubrpc.demo.api;
 
 
+import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
@@ -26,5 +28,7 @@ public interface UserService {
 
     long[] getIds(long[] ids);
 
+    List<Long> getIds(List<Long> ids);
 
+    Map<String , User> getUsers(Map<String, User> users);
 }

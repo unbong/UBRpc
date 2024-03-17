@@ -3,6 +3,8 @@ package io.unbong.ubrpc.core.util;
 import com.alibaba.fastjson.JSONObject;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +24,20 @@ public class TypeUtils {
         Class<?> aClass = origin.getClass();
         if(type.isAssignableFrom(aClass))
         {
-            return origin;
+//            if(origin instanceof List list)
+//            {
+//                Type originaGenericType = aClass.getGenericSuperclass();
+//
+//                Type genericType = type.getGenericSuperclass();
+//                if(genericType instanceof ParameterizedType parameterizedType)
+//                {
+//                    Type rawType =parameterizedType.getRawType();
+//                    System.out.println("type" + rawType);
+//                }
+//
+//            }
+//
+//            return origin;
         }
 
         // 数组类型
@@ -42,12 +57,14 @@ public class TypeUtils {
             return resultArray;
         }
 
-        // 穿过来的数据为对象类型时
+
+        // 过来的数据为对象类型时
         if(origin instanceof HashMap map)
         {
             JSONObject jsonObject = new JSONObject(map);
             return jsonObject.toJavaObject(type);
         }
+
 
         // 基本类型
         if(type.equals(Integer.class)|| type.equals(Integer.TYPE))

@@ -1,5 +1,7 @@
 package io.unbong.ubrpc.core.consumer;
 
+import io.unbong.ubrpc.core.api.LoadBalancer;
+import io.unbong.ubrpc.core.api.Router;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -35,4 +37,24 @@ public class ConsumerConfig {
             System.out.println("consumerBootStrap started ..." );
         };
     }
+
+    /**
+     * 装配默认负载均衡
+     * @return
+     */
+    @Bean
+    public LoadBalancer loadBalancer(){
+        return LoadBalancer.Default;
+    }
+
+    /**
+     * 默认路由
+     * @return
+     */
+    @Bean
+    public Router router(){
+        return Router.Default;
+    }
+
+
 }
