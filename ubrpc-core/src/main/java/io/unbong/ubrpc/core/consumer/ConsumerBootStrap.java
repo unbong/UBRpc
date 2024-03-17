@@ -2,6 +2,7 @@ package io.unbong.ubrpc.core.consumer;
 
 import io.unbong.ubrpc.core.annotation.UBConsumer;
 import io.unbong.ubrpc.core.api.LoadBalancer;
+import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.api.RpcContext;
 import lombok.Data;
@@ -46,13 +47,11 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
 
         Router router = _applicatoinContext.getBean(Router.class);
         LoadBalancer loadBalancer = _applicatoinContext.getBean(LoadBalancer.class);
+        RegistryCenter rc = _applicatoinContext.getBean(RegistryCenter.class);
 
-        String urls = _environment.getProperty("ubrpc.providers","");
-        if(Strings.isEmpty(urls))
-        {
-            System.out.println("ubrpc.provider is empty.");
-        }
-        String[] providers = urls.split(",");
+        RpcContext context = new RpcContext();
+        context.setRouter(router);
+        context.setLoadBalancer(loadBalancer);
 
 
         String[] names = _applicatoinContext.getBeanDefinitionNames();
@@ -60,9 +59,7 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
             Object bean = _applicatoinContext.getBean(name);
             List<Field> fields = findAnnotatedField(bean.getClass());
 
-            RpcContext context = new RpcContext();
-            context.setRouter(router);
-            context.setLoadBalancer(loadBalancer);
+
             if(!name.contains("ubrpcDemoConsumerApplication")) continue;
             //　创建代理对象，并设定
 
@@ -72,7 +69,8 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
                     String serviceName = service.getCanonicalName();
                     Object consumer = stub.get(serviceName);
                     if(consumer == null){
-                        consumer = createConsumerProxy(service, context, List.of(providers));
+                        consumer = createConsumerFromRegistry(service, context, rc);
+                    //createConsumerProxy(service, context, List.of(providers));
 
                     }
                     f.setAccessible(true);
@@ -84,6 +82,19 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
                 }
             });
         }
+    }
+
+    /**
+     * 处理服务与Consumer的关系
+     * @param service
+     * @param context
+     * @param rc
+     * @return
+     */
+    private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
+        String serviceName = service.getCanonicalName();
+        List<String> providers = rc.fetchAll(serviceName);
+        return createConsumerProxy(service, context, providers);
     }
 
     /**

@@ -1,12 +1,16 @@
 package io.unbong.ubrpc.core.consumer;
 
 import io.unbong.ubrpc.core.api.LoadBalancer;
+import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+
+import java.util.List;
 
 /**
  * Description
@@ -17,6 +21,8 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class ConsumerConfig {
 
+    @Value("${ubrpc.providers}")
+    String servers;
     @Bean
     public ConsumerBootStrap createConsumerBootStrap(){
         return new ConsumerBootStrap();
@@ -54,6 +60,15 @@ public class ConsumerConfig {
     @Bean
     public Router router(){
         return Router.Default;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public RegistryCenter comsumer_rc(){
+        return new RegistryCenter.StaticRegistryCenter(List.of(servers.split(",")));
     }
 
 
