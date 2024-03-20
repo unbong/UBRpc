@@ -30,5 +30,7 @@ public interface UserService {
 
     List<Long> getIds(List<Long> ids);
 
+    List<User> getUsers(List<User> users);
+
     Map<String , User> getUsers(Map<String, User> users);
 }

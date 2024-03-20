@@ -128,7 +128,7 @@ public class UBInvocationHandler implements InvocationHandler {
         try {
             String resJson = client.newCall(request)
                     .execute().body().string();
-
+            System.out.println(" ===> respJson = " + resJson);
             RpcResponse rpcResponse = JSON.parseObject(resJson,RpcResponse.class);
             return rpcResponse;
         } catch (IOException e) {

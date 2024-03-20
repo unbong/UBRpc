@@ -3,6 +3,7 @@ package io.unbong.ubrpc.core.consumer;
 import io.unbong.ubrpc.core.api.LoadBalancer;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
+import io.unbong.ubrpc.core.registry.ZKRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
@@ -29,7 +30,7 @@ public class ConsumerConfig {
     }
 
     /**
-     * Spring上下文初始换完成后 会调用start
+     * Spring上下文初始化完成后 会调用start
      * ApplicationRunner 出错时 会把程序挡掉
      * @param consumerBootStrap
      * @return
@@ -68,7 +69,7 @@ public class ConsumerConfig {
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter comsumer_rc(){
-        return new RegistryCenter.StaticRegistryCenter(List.of(servers.split(",")));
+        return new ZKRegistryCenter();
     }
 
 

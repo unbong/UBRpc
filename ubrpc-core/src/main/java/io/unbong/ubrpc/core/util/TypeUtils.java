@@ -37,7 +37,7 @@ public class TypeUtils {
 //
 //            }
 //
-//            return origin;
+           return origin;
         }
 
         // 数组类型
@@ -65,6 +65,9 @@ public class TypeUtils {
             return jsonObject.toJavaObject(type);
         }
 
+        if(origin instanceof JSONObject jsonObject){
+            return jsonObject.toJavaObject(type);
+        }
 
         // 基本类型
         if(type.equals(Integer.class)|| type.equals(Integer.TYPE))

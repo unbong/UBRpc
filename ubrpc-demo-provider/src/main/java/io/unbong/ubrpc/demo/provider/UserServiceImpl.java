@@ -91,6 +91,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getUsers(List<User> users) {
+        return users;
+    }
+
+    @Override
     public Map<String, User> getUsers(Map<String, User> users) {
         return users;
     }

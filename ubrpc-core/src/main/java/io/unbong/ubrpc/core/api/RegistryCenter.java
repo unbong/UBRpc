@@ -1,5 +1,7 @@
 package io.unbong.ubrpc.core.api;
 
+import io.unbong.ubrpc.core.registry.ChangedListener;
+
 import java.util.List;
 
 /**
@@ -10,8 +12,8 @@ import java.util.List;
  */
 public interface RegistryCenter {
 
-    void start();
-    void stop();
+    void start(); // p/c
+    void stop(); // p/c
 
 
     // provider
@@ -20,17 +22,17 @@ public interface RegistryCenter {
      * @param service  服务
      * @param instance 当前节点
      */
-    void register(String service, String instance);
+    void register(String service, String instance);  // p
 
-    void unregister(String service , String instance);
+    void unregister(String service , String instance); // p
 
     // consumer
-    List<String> fetchAll(String serviceName);
+    List<String> fetchAll(String serviceName);  // c
 
     /**
      * get
      */
-    void subscribe();
+    void subscribe(String service, ChangedListener listener);  // c
 
     class StaticRegistryCenter implements RegistryCenter{
 
@@ -64,7 +66,7 @@ public interface RegistryCenter {
         }
 
         @Override
-        public void subscribe() {
+        public void subscribe(String service, ChangedListener listener) {
         }
     }
 }

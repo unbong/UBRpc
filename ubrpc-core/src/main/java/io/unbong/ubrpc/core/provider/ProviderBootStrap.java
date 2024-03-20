@@ -1,13 +1,17 @@
 package io.unbong.ubrpc.core.provider;
 
 import io.unbong.ubrpc.core.annotation.UbProvider;
+import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
 import io.unbong.ubrpc.core.meta.ProviderMeta;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import io.unbong.ubrpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
@@ -15,6 +19,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,26 +29,70 @@ import java.util.Optional;
  * 3
  *  1 将签名与方法保存起来
  *
+ *   注册中心
+ *
+ *
  * @author <a href="ecunbong@gmail.com">unbong</a>
  */
 public class ProviderBootStrap implements ApplicationContextAware {
 
     ApplicationContext _applicationContext ;
+
+    private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
+    private String _instance;
+
+
+    @Value("${server.port}")
+    private String port;
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicationContext = applicationContext;
+
     }
 
     // 为每个服务创建多值的方法元数据
-    private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
 
+    @SneakyThrows
     @PostConstruct
     public void start(){
         Map<String, Object> map =_applicationContext.getBeansWithAnnotation(UbProvider.class);
+        // 创建skeleton
         map.values().forEach(v->{
             getInterface(v);
         });
+
+        // ip and port
+        String ip = InetAddress.getLocalHost().getHostAddress();
+        this._instance = ip+"_" + port;
+
     }
+
+    @PreDestroy
+    public void stop(){
+        skeleton.keySet().forEach(this::unregisterService);
+    }
+
+    private void unregisterService(String service) {
+        RegistryCenter rc = _applicationContext.getBean(RegistryCenter.class);
+        rc.unregister(service, _instance);
+    }
+
+    /**
+     * 在spring启动完毕后会进行注册
+     */
+    public void init(){
+        skeleton.keySet().forEach(this::registerService);
+    }
+
+    /**
+     * 注册到zookeeper
+     * @param service
+     */
+    private void registerService(String service) {
+        RegistryCenter rc = _applicationContext.getBean(RegistryCenter.class);
+        rc.register(service, _instance);
+    }
+
 
     private void getInterface(Object v) {
 
@@ -51,6 +100,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
         Class<?>[] itfers = v.getClass().getInterfaces();
         for (Class<?> itfer: itfers){
             Method[] methods = itfer.getMethods();
+            // 本地方法
             for(Method m : methods){
                 if (MethodUtil.checkLocalMethod(m)){
                     continue;
@@ -59,6 +109,8 @@ public class ProviderBootStrap implements ApplicationContextAware {
             }
         }
     }
+
+
 
     /**
      * 创建方法元数据
@@ -134,5 +186,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
         }
         return null;
     }
+
+
 
 }

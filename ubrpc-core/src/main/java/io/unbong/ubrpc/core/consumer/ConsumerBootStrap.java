@@ -5,6 +5,8 @@ import io.unbong.ubrpc.core.api.LoadBalancer;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.api.RpcContext;
+import io.unbong.ubrpc.core.registry.ChangedListener;
+import io.unbong.ubrpc.core.registry.Event;
 import lombok.Data;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeansException;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description
@@ -93,8 +96,30 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
      */
     private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
         String serviceName = service.getCanonicalName();
-        List<String> providers = rc.fetchAll(serviceName);
+
+        List<String> providers = mapUrl(rc.fetchAll(serviceName));
+        providers.forEach(System.out::println);
+
+        // 订阅节点更新
+        rc.subscribe(serviceName, new ChangedListener() {
+            @Override
+            public void fire(Event event) {
+                providers.clear();
+                providers.addAll(mapUrl(event.getData()));
+            }
+        });
         return createConsumerProxy(service, context, providers);
+    }
+
+    /**
+     *  ip_port -> http://ip:port
+     * @param provider
+     * @return
+     */
+    private List<String> mapUrl(List<String> provider)
+    {
+        return provider.stream()
+            .map(x->"http://" + x.replace('_',':')).collect(Collectors.toList());
     }
 
     /**
