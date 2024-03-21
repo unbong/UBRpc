@@ -1,8 +1,11 @@
 package io.unbong.ubrpc.core.util;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -104,5 +107,30 @@ public class TypeUtils {
         }
 
         return null;
+    }
+
+
+    @Nullable
+    public static   Object castMethodReturnType(Method method, Object rpcData) {
+        if(rpcData instanceof JSONObject)
+        {
+            JSONObject data = (JSONObject) rpcData;
+            return data.toJavaObject(method.getReturnType());
+        }else if(rpcData instanceof JSONArray jsonArray)
+        {
+            // 数组类型的反序列化操作
+            Object[] array = jsonArray.toArray();
+            // 返回数组的类型 仅仅是类型
+            Class<?> componentType = method.getReturnType().getComponentType();
+
+            Object resultArray  = Array.newInstance(componentType, array.length);
+            for (int i = 0; i < array.length; i++) {
+                Array.set(resultArray, i, array[i]);
+            }
+            return resultArray;
+        }
+
+        // ub JSONObject to
+        return TypeUtils.cast(rpcData, method.getReturnType());
     }
 }

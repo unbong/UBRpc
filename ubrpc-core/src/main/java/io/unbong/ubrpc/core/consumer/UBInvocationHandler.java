@@ -7,6 +7,7 @@ import io.unbong.ubrpc.core.api.*;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import io.unbong.ubrpc.core.util.TypeUtils;
 import okhttp3.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -65,7 +66,6 @@ public class UBInvocationHandler implements InvocationHandler {
             return null;
         }
 
-
         RpcRequest rpcRequest = new RpcRequest();
         rpcRequest.setService(service.getCanonicalName());
         rpcRequest.setMethodSign(MethodUtil.method(method));
@@ -75,42 +75,23 @@ public class UBInvocationHandler implements InvocationHandler {
         List<String> urls= _context.getRouter().route(_providers);
         String url = (String)_context.getLoadBalancer().choose(urls);
         System.out.println("loadBlancer.choose(urls)==>  " + url);
-        RpcResponse rpcResponse = post(rpcRequest,url);
+        RpcResponse<Object> rpcResponse = post(rpcRequest,url);
 
         if(rpcResponse.isStatus()){
 
             Object rpcData =  rpcResponse.getData();
 
-            if(rpcData instanceof JSONObject)
-            {
-                JSONObject data = (JSONObject)rpcData;
-                return data.toJavaObject(method.getReturnType());
-            }else if(rpcData instanceof JSONArray jsonArray)
-            {
-                // 数组类型的反序列化操作
-                Object[] array = jsonArray.toArray();
-                // 返回数组的类型 仅仅是类型
-                Class<?> componentType = method.getReturnType().getComponentType();
-
-                Object resultArray  = Array.newInstance(componentType, array.length);
-                for (int i = 0; i < array.length; i++) {
-                    Array.set(resultArray, i, array[i]);
-                }
-                return resultArray;
-            }
-
-            // ub JSONObject to
-            return  TypeUtils.cast(rpcData, method.getReturnType());
+            return TypeUtils.castMethodReturnType(method, rpcData);
         }
         else{
             Exception ex = rpcResponse.getException();
             //ex.printStackTrace();
 
             throw new RuntimeException(ex);
-
         }
 //        return null;
     }
+
 
     OkHttpClient client = new OkHttpClient.Builder()
             .connectionPool(new ConnectionPool(16, 60, TimeUnit.SECONDS))
@@ -129,7 +110,7 @@ public class UBInvocationHandler implements InvocationHandler {
             String resJson = client.newCall(request)
                     .execute().body().string();
             System.out.println(" ===> respJson = " + resJson);
-            RpcResponse rpcResponse = JSON.parseObject(resJson,RpcResponse.class);
+            RpcResponse<Object> rpcResponse = JSON.parseObject(resJson,RpcResponse.class);
             return rpcResponse;
         } catch (IOException e) {
             e.printStackTrace();

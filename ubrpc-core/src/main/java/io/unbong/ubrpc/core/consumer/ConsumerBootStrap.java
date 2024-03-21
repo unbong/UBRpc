@@ -7,6 +7,7 @@ import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.api.RpcContext;
 import io.unbong.ubrpc.core.registry.ChangedListener;
 import io.unbong.ubrpc.core.registry.Event;
+import io.unbong.ubrpc.core.util.MethodUtil;
 import lombok.Data;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeansException;
@@ -60,8 +61,7 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
         String[] names = _applicatoinContext.getBeanDefinitionNames();
         for(String name : names){
             Object bean = _applicatoinContext.getBean(name);
-            List<Field> fields = findAnnotatedField(bean.getClass());
-
+            List<Field> fields = MethodUtil.findAnnotatedField(bean.getClass(), UBConsumer.class);
 
             if(!name.contains("ubrpcDemoConsumerApplication")) continue;
             //　创建代理对象，并设定
@@ -138,23 +138,6 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
     }
 
 
-    private List<Field> findAnnotatedField(Class<?> aClass) {
-        List<Field> result = new ArrayList<>();
-        // ub Spring 启动后的类是代理过的 不是原始定义的类
-        // ub
-        while (aClass != null)
-        {
-            Field[] fields = aClass.getDeclaredFields();
-            for(Field field : fields){
-                if(field.isAnnotationPresent(UBConsumer.class))
-                {
-                    result.add(field);
-                }
-            }
-            aClass = aClass.getSuperclass();
-        }
-        return result;
-    }
 
     @Override
     public void setEnvironment(Environment environment) {
