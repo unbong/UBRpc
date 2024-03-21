@@ -33,7 +33,7 @@ public class ProviderConfig {
     public ApplicationRunner consumer_runner(@Autowired ProviderBootStrap providerBootStrap){
         return x->{
             System.out.println("providerBootStrap starting..." );
-            providerBootStrap.init();
+            providerBootStrap.start();
             System.out.println("providerBootStrap started ..." );
         };
     }
@@ -42,7 +42,7 @@ public class ProviderConfig {
      *
      * @return
      */
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Bean //(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter provider_rc()
     {
         return new ZKRegistryCenter();

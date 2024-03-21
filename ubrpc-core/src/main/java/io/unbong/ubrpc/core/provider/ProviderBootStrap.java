@@ -9,6 +9,7 @@ import io.unbong.ubrpc.core.util.MethodUtil;
 import io.unbong.ubrpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Data;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,12 +35,14 @@ import java.util.Optional;
  *
  * @author <a href="ecunbong@gmail.com">unbong</a>
  */
+@Data
 public class ProviderBootStrap implements ApplicationContextAware {
 
     ApplicationContext _applicationContext ;
-
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
     private String _instance;
+
+    RegistryCenter rc;
 
 
     @Value("${server.port}")
@@ -47,41 +50,47 @@ public class ProviderBootStrap implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicationContext = applicationContext;
-
     }
 
     // 为每个服务创建多值的方法元数据
 
+    /**
+     * s
+     */
     @SneakyThrows
-    @PostConstruct
     public void start(){
-        Map<String, Object> map =_applicationContext.getBeansWithAnnotation(UbProvider.class);
-        // 创建skeleton
-        map.values().forEach(v->{
-            getInterface(v);
-        });
-
         // ip and port
         String ip = InetAddress.getLocalHost().getHostAddress();
         this._instance = ip+"_" + port;
+
+        rc.start();
+        // 注册服务列表
+        skeleton.keySet().forEach(this::registerService);
+
 
     }
 
     @PreDestroy
     public void stop(){
         skeleton.keySet().forEach(this::unregisterService);
+        rc.stop();
     }
 
     private void unregisterService(String service) {
-        RegistryCenter rc = _applicationContext.getBean(RegistryCenter.class);
         rc.unregister(service, _instance);
     }
 
     /**
      * 在spring启动完毕后会进行注册
+     *   1
      */
+    @PostConstruct
     public void init(){
-        skeleton.keySet().forEach(this::registerService);
+        rc = _applicationContext.getBean(RegistryCenter.class);
+        // 基于skeleton创建服务列表
+        skeleton.values().forEach(v->{
+            getInterface(v);
+        });
     }
 
     /**
@@ -89,7 +98,6 @@ public class ProviderBootStrap implements ApplicationContextAware {
      * @param service
      */
     private void registerService(String service) {
-        RegistryCenter rc = _applicationContext.getBean(RegistryCenter.class);
         rc.register(service, _instance);
     }
 
