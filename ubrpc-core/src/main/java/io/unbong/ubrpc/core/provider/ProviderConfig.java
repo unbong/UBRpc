@@ -30,12 +30,18 @@ public class ProviderConfig {
      * @return
      */
     @Bean
-    public ApplicationRunner consumer_runner(@Autowired ProviderBootStrap providerBootStrap){
+    @Order(Integer.MIN_VALUE)
+    public ApplicationRunner provider_runner(@Autowired ProviderBootStrap providerBootStrap){
         return x->{
             System.out.println("providerBootStrap starting..." );
             providerBootStrap.start();
             System.out.println("providerBootStrap started ..." );
         };
+    }
+
+    @Bean
+    public ProviderInvoker providerInvoker(@Autowired ProviderBootStrap providerBootStrap){
+        return new ProviderInvoker(providerBootStrap);
     }
 
     /**
