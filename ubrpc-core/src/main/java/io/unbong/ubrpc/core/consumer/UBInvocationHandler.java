@@ -1,25 +1,17 @@
 package io.unbong.ubrpc.core.consumer;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import io.unbong.ubrpc.core.api.*;
+import io.unbong.ubrpc.core.consumer.http.OkHttpInvoker;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import io.unbong.ubrpc.core.util.TypeUtils;
 import okhttp3.*;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Description
  *
- * 动态代理的代理类
+ * 消费端动态代理处理类
  *
  * @author <a href="ecunbong@gmail.com">unbong</a>
  * 2024-03-10 21:02
@@ -31,6 +23,8 @@ public class UBInvocationHandler implements InvocationHandler {
     Class<?> service ;
     RpcContext _context;
     List<String> _providers;
+
+    HttpInvoker httpInvoker = new OkHttpInvoker();
 
     public UBInvocationHandler(Class<?> clazz, RpcContext context, List<String> providers){
         this.service = clazz;
@@ -75,7 +69,7 @@ public class UBInvocationHandler implements InvocationHandler {
         List<String> urls= _context.getRouter().route(_providers);
         String url = (String)_context.getLoadBalancer().choose(urls);
         System.out.println("loadBlancer.choose(urls)==>  " + url);
-        RpcResponse<Object> rpcResponse = post(rpcRequest,url);
+        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest,url);
 
         if(rpcResponse.isStatus()){
 
@@ -90,32 +84,5 @@ public class UBInvocationHandler implements InvocationHandler {
             throw new RuntimeException(ex);
         }
 //        return null;
-    }
-
-
-    OkHttpClient client = new OkHttpClient.Builder()
-            .connectionPool(new ConnectionPool(16, 60, TimeUnit.SECONDS))
-            .readTimeout(1000,TimeUnit.SECONDS)
-            .connectTimeout(1000,TimeUnit.SECONDS )
-            .build();
-    private RpcResponse post(RpcRequest rpcRequest,String url) {
-
-        String reqJson = JSON.toJSONString(rpcRequest);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(RequestBody.create(reqJson,  JSONTYPE))
-                .build();
-
-        try {
-            String resJson = client.newCall(request)
-                    .execute().body().string();
-            System.out.println(" ===> respJson = " + resJson);
-            RpcResponse<Object> rpcResponse = JSON.parseObject(resJson,RpcResponse.class);
-            return rpcResponse;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
     }
 }
