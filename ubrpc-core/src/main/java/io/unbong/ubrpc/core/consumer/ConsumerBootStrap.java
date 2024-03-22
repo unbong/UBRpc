@@ -74,6 +74,7 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
                     if(consumer == null){
                         consumer = createConsumerFromRegistry(service, context, rc);
                     //createConsumerProxy(service, context, List.of(providers));
+                        stub.put(serviceName, consumer);
 
                     }
                     f.setAccessible(true);
@@ -133,7 +134,6 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
         return Proxy.newProxyInstance(service.getClassLoader(),
                 new Class[]{service}
                 , new UBInvocationHandler(service,  context, providers){}
-
         );
     }
 
