@@ -1,5 +1,6 @@
 package io.unbong.ubrpc.core.meta;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.lang.reflect.Method;
@@ -13,6 +14,7 @@ import java.lang.reflect.Method;
  */
 
 @Data
+@Builder
 public class ProviderMeta {
     // 具体的某个方法
     Method method;          // 方法

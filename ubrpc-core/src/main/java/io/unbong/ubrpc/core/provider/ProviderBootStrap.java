@@ -14,6 +14,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -123,18 +124,18 @@ public class ProviderBootStrap implements ApplicationContextAware {
     }
 
 
-    private void getInterface(Object v) {
+    private void getInterface(Object impl) {
 
         // 实现多个接口时 将所有接口的方法元数据收集
-        Class<?>[] itfers = v.getClass().getInterfaces();
-        for (Class<?> itfer: itfers){
-            Method[] methods = itfer.getMethods();
+        Class<?>[] itfers = impl.getClass().getInterfaces();
+        for (Class<?> service : itfers){
+            Method[] methods = service.getMethods();
             // 本地方法
             for(Method m : methods){
                 if (MethodUtil.checkLocalMethod(m)){
                     continue;
                 }
-                createProvider(itfer, v, m);
+                createProvider(service, impl, m);
             }
         }
     }
@@ -143,17 +144,18 @@ public class ProviderBootStrap implements ApplicationContextAware {
 
     /**
      * 创建方法元数据
-     * @param itfer
-     * @param v
+     * @param service
+     * @param impl
      * @param m
      */
-    private void createProvider(Class<?> itfer, Object v, Method m) {
-        ProviderMeta meta = new ProviderMeta();
-        meta.setServiceImpl(v);
-        meta.setMethodSign(MethodUtil.method(m));
-        meta.setMethod(m);
+    private void createProvider(Class<?> service, Object impl, Method m) {
+        ProviderMeta meta = ProviderMeta.builder()
+                .serviceImpl(impl)
+                .method(m)
+                .methodSign(MethodUtil.method(m))
+                .build();
         System.out.println("create a provider: "+meta );
-        skeleton.add(itfer.getCanonicalName(), meta);
+        skeleton.add(service.getCanonicalName(), meta);
 
     }
 

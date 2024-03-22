@@ -1,5 +1,7 @@
 package io.unbong.ubrpc.core.api;
 
+import io.unbong.ubrpc.core.meta.InstanceMeta;
+
 import java.util.List;
 
 public interface Router<T> {

@@ -1,8 +1,7 @@
 package io.unbong.ubrpc.core.provider;
 
 import io.unbong.ubrpc.core.api.RegistryCenter;
-import io.unbong.ubrpc.core.consumer.ConsumerBootStrap;
-import io.unbong.ubrpc.core.registry.ZKRegistryCenter;
+import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;

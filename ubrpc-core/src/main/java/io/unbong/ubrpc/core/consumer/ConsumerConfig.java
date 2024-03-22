@@ -3,15 +3,14 @@ package io.unbong.ubrpc.core.consumer;
 import io.unbong.ubrpc.core.api.LoadBalancer;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
-import io.unbong.ubrpc.core.registry.ZKRegistryCenter;
+import io.unbong.ubrpc.core.meta.InstanceMeta;
+import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-
-import java.util.List;
 
 /**
  * Description
@@ -50,7 +49,7 @@ public class ConsumerConfig {
      * @return
      */
     @Bean
-    public LoadBalancer loadBalancer(){
+    public LoadBalancer<InstanceMeta> loadBalancer(){
         return LoadBalancer.Default;
     }
 
@@ -59,7 +58,7 @@ public class ConsumerConfig {
      * @return
      */
     @Bean
-    public Router router(){
+    public Router<InstanceMeta> router(){
         return Router.Default;
     }
 
