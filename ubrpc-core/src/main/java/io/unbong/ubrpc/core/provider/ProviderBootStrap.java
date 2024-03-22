@@ -52,7 +52,6 @@ public class ProviderBootStrap implements ApplicationContextAware {
     @Value("${app.env}")
     private String env;
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicationContext = applicationContext;

@@ -11,6 +11,7 @@ import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.TreeSet;
@@ -30,16 +31,23 @@ public class ZKRegistryCenter implements RegistryCenter {
     private CuratorFramework client = null;
 
 
+    @Value("${ubrpc.zkServer}")
+    private String server;
+
+    @Value("${ubrpc.zkRoot}")
+    private String root;
+
+
     @Override
     public void start() {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
         client = CuratorFrameworkFactory.builder()
-                .connectString("localhost:12181")
-                .namespace("ubrpc")
+                .connectString(server)
+                .namespace(root)
                 .retryPolicy(retryPolicy)
                 .build();
         client.start();
-        System.out.println("ZKRegistryCenter----> started");
+        System.out.println("ZKRegistryCenter----> started to server ["+ server + "/" + root +"]");
     }
 
     @Override
