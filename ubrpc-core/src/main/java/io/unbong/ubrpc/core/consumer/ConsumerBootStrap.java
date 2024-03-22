@@ -6,12 +6,14 @@ import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.api.RpcContext;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
+import io.unbong.ubrpc.core.meta.ServiceMeta;
 import io.unbong.ubrpc.core.registry.ChangedListener;
 import io.unbong.ubrpc.core.registry.Event;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import lombok.Data;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
@@ -37,6 +39,14 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
     ApplicationContext _applicatoinContext ;
     Environment _environment;
 
+
+    @Value("${app.id}")
+    private String app;
+    @Value("${app.namespace}")
+    private String namespace;
+    @Value("${app.env}")
+    private String env;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicatoinContext = applicationContext;
@@ -50,8 +60,8 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
      */
     public void start(){
 
-        Router router = _applicatoinContext.getBean(Router.class);
-        LoadBalancer loadBalancer = _applicatoinContext.getBean(LoadBalancer.class);
+        Router<InstanceMeta> router = _applicatoinContext.getBean(Router.class);
+        LoadBalancer<InstanceMeta> loadBalancer = _applicatoinContext.getBean(LoadBalancer.class);
         RegistryCenter rc = _applicatoinContext.getBean(RegistryCenter.class);
 
         RpcContext context = new RpcContext();
@@ -99,11 +109,17 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
     private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
         String serviceName = service.getCanonicalName();
 
-        List<InstanceMeta> providers = rc.fetchAll(serviceName);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .name(serviceName)
+                .app(this.app)
+                .namespace(this.namespace)
+                .env(this.env)
+                .build();
+        List<InstanceMeta> providers = rc.fetchAll(serviceMeta);
         providers.forEach(System.out::println);
 
         // 订阅节点更新
-        rc.subscribe(serviceName, new ChangedListener() {
+        rc.subscribe(serviceMeta, new ChangedListener() {
             @Override
             public void fire(Event event) {
                 providers.clear();

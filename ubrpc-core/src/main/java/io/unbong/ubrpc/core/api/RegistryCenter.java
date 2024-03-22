@@ -1,6 +1,7 @@
 package io.unbong.ubrpc.core.api;
 
 import io.unbong.ubrpc.core.meta.InstanceMeta;
+import io.unbong.ubrpc.core.meta.ServiceMeta;
 import io.unbong.ubrpc.core.registry.ChangedListener;
 
 import java.util.List;
@@ -23,17 +24,17 @@ public interface RegistryCenter {
      * @param service  服务
      * @param instance 当前节点
      */
-    void register(String service, InstanceMeta instance);  // p
+    void register(ServiceMeta service, InstanceMeta instance);  // p
 
-    void unregister(String service , InstanceMeta instance); // p
+    void unregister(ServiceMeta service , InstanceMeta instance); // p
 
     // consumer
-    List<InstanceMeta> fetchAll(String serviceName);  // c
+    List<InstanceMeta> fetchAll(ServiceMeta serviceName);  // c
 
     /**
      * get
      */
-    void subscribe(String service, ChangedListener listener);  // c
+    void subscribe(ServiceMeta service, ChangedListener listener);  // c
 
     class StaticRegistryCenter implements RegistryCenter{
 
@@ -52,22 +53,22 @@ public interface RegistryCenter {
         }
 
         @Override
-        public void register(String service, InstanceMeta instance) {
+        public void register(ServiceMeta service, InstanceMeta instance) {
 
         }
 
         @Override
-        public void unregister(String service, InstanceMeta instance) {
+        public void unregister(ServiceMeta service, InstanceMeta instance) {
 
         }
 
         @Override
-        public List<InstanceMeta> fetchAll(String serviceName) {
+        public List<InstanceMeta> fetchAll(ServiceMeta serviceName) {
             return _providers;
         }
 
         @Override
-        public void subscribe(String service, ChangedListener listener) {
+        public void subscribe(ServiceMeta service, ChangedListener listener) {
         }
     }
 }

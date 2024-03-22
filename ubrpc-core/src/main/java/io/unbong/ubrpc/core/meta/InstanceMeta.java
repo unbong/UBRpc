@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * Description
+ *  描述服务实例元数据
  *
  *
  * @author <a href="ecunbong@gmail.com">unbong</a>

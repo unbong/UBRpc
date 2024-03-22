@@ -4,6 +4,7 @@ import io.unbong.ubrpc.core.annotation.UbProvider;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.meta.ProviderMeta;
+import io.unbong.ubrpc.core.meta.ServiceMeta;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -42,6 +43,16 @@ public class ProviderBootStrap implements ApplicationContextAware {
 
     @Value("${server.port}")
     private String port;
+
+
+    @Value("${app.id}")
+    private String app;
+    @Value("${app.namespace}")
+    private String namespace;
+    @Value("${app.env}")
+    private String env;
+
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicationContext = applicationContext;
@@ -72,7 +83,14 @@ public class ProviderBootStrap implements ApplicationContextAware {
     }
 
     private void unregisterService(String service) {
-        rc.unregister(service, _instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .name(service)
+                .app(this.app)
+                .namespace(this.namespace)
+                .env(this.env)
+                .build();
+
+        rc.unregister(serviceMeta, _instance);
     }
 
     /**
@@ -95,7 +113,14 @@ public class ProviderBootStrap implements ApplicationContextAware {
      * @param service
      */
     private void registerService(String service) {
-        rc.register(service, _instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .name(service)
+                .app(this.app)
+                .namespace(this.namespace)
+                .env(this.env)
+                .build();
+
+        rc.register(serviceMeta, _instance);
     }
 
 

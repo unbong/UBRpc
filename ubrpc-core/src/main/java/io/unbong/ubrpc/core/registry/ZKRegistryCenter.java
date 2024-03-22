@@ -2,6 +2,7 @@ package io.unbong.ubrpc.core.registry;
 
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
+import io.unbong.ubrpc.core.meta.ServiceMeta;
 import lombok.SneakyThrows;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -54,8 +55,8 @@ public class ZKRegistryCenter implements RegistryCenter {
      * @param instance 当前节点            注册为临时节点
      */
     @Override
-    public void register(String service, InstanceMeta instance) {
-        String serverPath ="/" + service;
+    public void register(ServiceMeta service, InstanceMeta instance) {
+        String serverPath ="/" + service.toPath();
         try {
             if(client.checkExists().forPath(serverPath) == null){
                 // 创建服务的持久化的节点
@@ -77,9 +78,9 @@ public class ZKRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void unregister(String service, InstanceMeta instance) {
+    public void unregister(ServiceMeta service, InstanceMeta instance) {
 
-        String serverPath ="/" + service;
+        String serverPath ="/" + service.toPath();;
 
         try {
             if(client.checkExists().forPath(serverPath) == null){
@@ -97,8 +98,8 @@ public class ZKRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public List<InstanceMeta> fetchAll(String service) {
-        String serverPath ="/" + service;
+    public List<InstanceMeta> fetchAll(ServiceMeta service) {
+        String serverPath ="/" + service.toPath();;
 
         try {
             // 获取所有子节点
@@ -135,8 +136,8 @@ public class ZKRegistryCenter implements RegistryCenter {
      */
     @SneakyThrows
     @Override
-    public void subscribe(String service, ChangedListener listener) {
-        String servicePath = "/" + service;
+    public void subscribe(ServiceMeta service, ChangedListener listener) {
+        String servicePath = "/" + service.toPath();;
         // 有缓存 深度为2
         final TreeCache cache =  TreeCache.newBuilder(client, servicePath)
                 .setCacheData(true)
