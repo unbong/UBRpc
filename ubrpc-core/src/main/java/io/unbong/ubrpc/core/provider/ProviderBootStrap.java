@@ -2,11 +2,9 @@ package io.unbong.ubrpc.core.provider;
 
 import io.unbong.ubrpc.core.annotation.UbProvider;
 import io.unbong.ubrpc.core.api.RegistryCenter;
-import io.unbong.ubrpc.core.api.RpcRequest;
-import io.unbong.ubrpc.core.api.RpcResponse;
+import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.meta.ProviderMeta;
 import io.unbong.ubrpc.core.util.MethodUtil;
-import io.unbong.ubrpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
@@ -18,12 +16,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  *
@@ -40,7 +35,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
 
     ApplicationContext _applicationContext ;
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
-    private String _instance;
+    private InstanceMeta _instance;
 
     RegistryCenter rc;
 
@@ -61,7 +56,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
     public void start(){
         // ip and port
         String ip = InetAddress.getLocalHost().getHostAddress();
-        this._instance = ip+"_" + port;
+        this._instance =InstanceMeta.http(ip, Integer.valueOf(port));
 
         rc.start();
         // 注册服务列表

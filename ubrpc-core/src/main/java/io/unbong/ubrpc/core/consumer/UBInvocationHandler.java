@@ -2,6 +2,7 @@ package io.unbong.ubrpc.core.consumer;
 
 import io.unbong.ubrpc.core.api.*;
 import io.unbong.ubrpc.core.consumer.http.OkHttpInvoker;
+import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import io.unbong.ubrpc.core.util.TypeUtils;
 import okhttp3.*;
@@ -22,11 +23,11 @@ public class UBInvocationHandler implements InvocationHandler {
     final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
     Class<?> service ;
     RpcContext _context;
-    List<String> _providers;
+    List<InstanceMeta> _providers;
 
     HttpInvoker httpInvoker = new OkHttpInvoker();
 
-    public UBInvocationHandler(Class<?> clazz, RpcContext context, List<String> providers){
+    public UBInvocationHandler(Class<?> clazz, RpcContext context, List<InstanceMeta> providers){
         this.service = clazz;
         _context = context;
         _providers = providers;
@@ -66,10 +67,11 @@ public class UBInvocationHandler implements InvocationHandler {
         rpcRequest.setArgs(args);
 
 
-        List<String> urls= _context.getRouter().route(_providers);
-        String url = (String)_context.getLoadBalancer().choose(urls);
-        System.out.println("loadBlancer.choose(urls)==>  " + url);
-        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest,url);
+        List<InstanceMeta> instances = _context.getRouter().route(_providers);
+        InstanceMeta node = (InstanceMeta) _context.getLoadBalancer().choose(instances);
+        System.out.println("loadBlancer.choose(urls)==>  " + node.toURL());
+        String url = node.toURL();
+        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, url);
 
         if(rpcResponse.isStatus()){
 

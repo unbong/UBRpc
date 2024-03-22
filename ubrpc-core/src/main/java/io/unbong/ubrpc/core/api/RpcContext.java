@@ -1,5 +1,6 @@
 package io.unbong.ubrpc.core.api;
 
+import io.unbong.ubrpc.core.meta.InstanceMeta;
 import lombok.Data;
 
 import java.util.List;
@@ -13,6 +14,6 @@ import java.util.List;
 @Data
 public class RpcContext {
     List<Filter> filters;
-    LoadBalancer loadBalancer;
-    Router router;
+    LoadBalancer<InstanceMeta> loadBalancer;
+    Router<InstanceMeta> router;
 }

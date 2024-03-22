@@ -5,6 +5,7 @@ import io.unbong.ubrpc.core.api.LoadBalancer;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.api.RpcContext;
+import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.registry.ChangedListener;
 import io.unbong.ubrpc.core.registry.Event;
 import io.unbong.ubrpc.core.util.MethodUtil;
@@ -98,7 +99,7 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
     private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
         String serviceName = service.getCanonicalName();
 
-        List<String> providers = mapUrl(rc.fetchAll(serviceName));
+        List<InstanceMeta> providers = rc.fetchAll(serviceName);
         providers.forEach(System.out::println);
 
         // 订阅节点更新
@@ -106,22 +107,13 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
             @Override
             public void fire(Event event) {
                 providers.clear();
-                providers.addAll(mapUrl(event.getData()));
+                providers.addAll(event.getData());
             }
         });
         return createConsumerProxy(service, context, providers);
     }
 
-    /**
-     *  ip_port -> http://ip:port
-     * @param provider
-     * @return
-     */
-    private List<String> mapUrl(List<String> provider)
-    {
-        return provider.stream()
-            .map(x->"http://" + x.replace('_',':')).collect(Collectors.toList());
-    }
+
 
     /**
      * 通过 动态代理 bytebuddy
@@ -130,7 +122,7 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
      * @param providers
      * @return
      */
-    private Object createConsumerProxy(Class<?> service, RpcContext context, List<String> providers) {
+    private Object createConsumerProxy(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         return Proxy.newProxyInstance(service.getClassLoader(),
                 new Class[]{service}
                 , new UBInvocationHandler(service,  context, providers){}

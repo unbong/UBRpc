@@ -2,6 +2,7 @@ package io.unbong.ubrpc.core.consumer;
 
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
+import io.unbong.ubrpc.core.meta.InstanceMeta;
 
 /**
  * Description
