@@ -10,6 +10,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -33,6 +34,7 @@ import java.util.Map;
  * @author <a href="ecunbong@gmail.com">unbong</a>
  */
 @Data
+@Slf4j
 public class ProviderBootStrap implements ApplicationContextAware {
 
     ApplicationContext _applicationContext ;
@@ -102,7 +104,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
         Map<String, Object> providers = _applicationContext.getBeansWithAnnotation(UbProvider.class);
         rc = _applicationContext.getBean(RegistryCenter.class);
         // 基于skeleton创建服务列表
-        providers.keySet().forEach(System.out::println);
+        providers.keySet().forEach(log::info);
         providers.values().forEach(v->{
             getInterface(v);
         });
@@ -154,7 +156,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
                 .method(m)
                 .methodSign(MethodUtil.method(m))
                 .build();
-        System.out.println("create a provider: "+meta );
+        log.info("create a provider: "+meta );
         skeleton.add(service.getCanonicalName(), meta);
 
     }

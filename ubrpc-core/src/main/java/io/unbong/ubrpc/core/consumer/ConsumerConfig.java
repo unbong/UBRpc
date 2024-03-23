@@ -5,6 +5,7 @@ import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
@@ -19,6 +20,7 @@ import org.springframework.core.annotation.Order;
  * 2024-03-10 20:49
  */
 @Configuration
+@Slf4j
 public class ConsumerConfig {
 
     @Value("${ubrpc.providers}")
@@ -38,9 +40,9 @@ public class ConsumerConfig {
     @Order(Integer.MIN_VALUE)
     public ApplicationRunner consumer_runner(@Autowired ConsumerBootStrap consumerBootStrap){
         return x->{
-            System.out.println("consumerBootStrap starting..." );
+            log.info("consumerBootStrap starting..." );
             consumerBootStrap.start();
-            System.out.println("consumerBootStrap started ..." );
+            log.info("consumerBootStrap started ..." );
         };
     }
 

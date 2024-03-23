@@ -5,6 +5,7 @@ import io.unbong.ubrpc.core.consumer.http.OkHttpInvoker;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import io.unbong.ubrpc.core.util.TypeUtils;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -17,6 +18,7 @@ import java.util.List;
  * @author <a href="ecunbong@gmail.com">unbong</a>
  * 2024-03-10 21:02
  */
+@Slf4j
 public class UBInvocationHandler implements InvocationHandler {
 
 
@@ -69,7 +71,7 @@ public class UBInvocationHandler implements InvocationHandler {
 
         List<InstanceMeta> instances = _context.getRouter().route(_providers);
         InstanceMeta node = (InstanceMeta) _context.getLoadBalancer().choose(instances);
-        System.out.println("loadBlancer.choose(urls)==>  " + node.toURL());
+        log.debug("loadBlancer.choose(urls)==>  " + node.toURL());
         String url = node.toURL();
         RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, url);
 

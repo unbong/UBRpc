@@ -41,7 +41,7 @@ public class UbrpcDemoProviderApplication {
 //            request.setArgs(new Object[]{100});
 //
 //            RpcResponse<Object> rpcResponse = invoke(request);
-//            System.out.println("return : "+rpcResponse.getData());
+//            log.info("return : "+rpcResponse.getData());
 
             // test 2 parameters method
 //            RpcRequest request1 = new RpcRequest();
@@ -50,7 +50,7 @@ public class UbrpcDemoProviderApplication {
 //            request1.setArgs(new Object[]{100, "CC"});
 //
 //            RpcResponse<Object> rpcResponse1 = invoke(request1);
-//            System.out.println("return : "+rpcResponse1.getData());
+//            log.info("return : "+rpcResponse1.getData());
 
         };
     }

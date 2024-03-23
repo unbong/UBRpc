@@ -35,7 +35,7 @@ public class TypeUtils {
 //                if(genericType instanceof ParameterizedType parameterizedType)
 //                {
 //                    Type rawType =parameterizedType.getRawType();
-//                    System.out.println("type" + rawType);
+//                    log.debug("type" + rawType);
 //                }
 //
 //            }

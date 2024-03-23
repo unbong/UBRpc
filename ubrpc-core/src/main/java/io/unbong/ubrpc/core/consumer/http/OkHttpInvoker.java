@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
 import io.unbong.ubrpc.core.consumer.HttpInvoker;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="ecunbong@gmail.com">unbong</a>
  * 2024-03-21 22:47
  */
+@Slf4j
 public class OkHttpInvoker implements HttpInvoker {
     final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
     OkHttpClient client;
@@ -38,7 +40,7 @@ public class OkHttpInvoker implements HttpInvoker {
         try {
             String resJson = client.newCall(request)
                     .execute().body().string();
-            System.out.println(" ===> respJson = " + resJson);
+            log.debug(" ===> respJson = " + resJson);
             RpcResponse<Object> rpcResponse = JSON.parseObject(resJson,RpcResponse.class);
             return rpcResponse;
         } catch (IOException e) {

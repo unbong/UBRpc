@@ -11,6 +11,7 @@ import io.unbong.ubrpc.core.registry.ChangedListener;
 import io.unbong.ubrpc.core.registry.Event;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  * 2024-03-10 20:47
  */
 @Data
+@Slf4j
 public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAware {
 
     ApplicationContext _applicatoinContext ;
@@ -116,7 +118,6 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
                 .env(this.env)
                 .build();
         List<InstanceMeta> providers = rc.fetchAll(serviceMeta);
-        providers.forEach(System.out::println);
 
         // 订阅节点更新
         rc.subscribe(serviceMeta, new ChangedListener() {
