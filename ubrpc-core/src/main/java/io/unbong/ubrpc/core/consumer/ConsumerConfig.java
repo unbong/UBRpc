@@ -1,8 +1,10 @@
 package io.unbong.ubrpc.core.consumer;
 
+import io.unbong.ubrpc.core.api.Filter;
 import io.unbong.ubrpc.core.api.LoadBalancer;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
+import io.unbong.ubrpc.core.filter.CacheFilter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,15 @@ public class ConsumerConfig {
             consumerBootStrap.start();
             log.info("consumerBootStrap started ..." );
         };
+    }
+
+    /**
+     * 缓存过滤器
+     * @return
+     */
+    @Bean
+    public Filter filter(){
+        return new CacheFilter();
     }
 
     /**

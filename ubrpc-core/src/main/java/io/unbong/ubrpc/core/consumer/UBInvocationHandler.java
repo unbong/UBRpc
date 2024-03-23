@@ -7,6 +7,8 @@ import io.unbong.ubrpc.core.util.MethodUtil;
 import io.unbong.ubrpc.core.util.TypeUtils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -68,6 +70,16 @@ public class UBInvocationHandler implements InvocationHandler {
         rpcRequest.setMethodSign(MethodUtil.method(method));
         rpcRequest.setArgs(args);
 
+        // filter
+        for (Filter filter : _context.getFilters()) {
+            Object preResponce =filter.preFilter(rpcRequest);
+            if(preResponce != null)
+            {
+                log.debug(filter.getClass().getName() + "---> preFilter response: " + preResponce);
+
+                return preResponce;
+            }
+        }
 
         List<InstanceMeta> instances = _context.getRouter().route(_providers);
         InstanceMeta node = (InstanceMeta) _context.getLoadBalancer().choose(instances);
@@ -75,6 +87,19 @@ public class UBInvocationHandler implements InvocationHandler {
         String url = node.toURL();
         RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, url);
 
+        Object result = castReturnResult(method, rpcResponse);
+
+        for (Filter filter : _context.getFilters()) {
+            result =filter.postFilter(rpcRequest, rpcResponse, result);
+
+        }
+
+        return result;
+//        return null;
+    }
+
+    @Nullable
+    private static Object castReturnResult(Method method, RpcResponse<?> rpcResponse) {
         if(rpcResponse.isStatus()){
 
             Object rpcData =  rpcResponse.getData();
@@ -87,6 +112,5 @@ public class UBInvocationHandler implements InvocationHandler {
 
             throw new RuntimeException(ex);
         }
-//        return null;
     }
 }

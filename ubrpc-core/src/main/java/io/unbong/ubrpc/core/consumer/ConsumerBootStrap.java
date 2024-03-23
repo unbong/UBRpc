@@ -1,10 +1,7 @@
 package io.unbong.ubrpc.core.consumer;
 
 import io.unbong.ubrpc.core.annotation.UBConsumer;
-import io.unbong.ubrpc.core.api.LoadBalancer;
-import io.unbong.ubrpc.core.api.RegistryCenter;
-import io.unbong.ubrpc.core.api.Router;
-import io.unbong.ubrpc.core.api.RpcContext;
+import io.unbong.ubrpc.core.api.*;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.meta.ServiceMeta;
 import io.unbong.ubrpc.core.registry.ChangedListener;
@@ -65,10 +62,13 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
         Router<InstanceMeta> router = _applicatoinContext.getBean(Router.class);
         LoadBalancer<InstanceMeta> loadBalancer = _applicatoinContext.getBean(LoadBalancer.class);
         RegistryCenter rc = _applicatoinContext.getBean(RegistryCenter.class);
+        List<Filter> filters  = _applicatoinContext.getBeansOfType(Filter.class).
+                        values().stream().toList();
 
         RpcContext context = new RpcContext();
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
+        context.setFilters(filters);
 
 
         String[] names = _applicatoinContext.getBeanDefinitionNames();
