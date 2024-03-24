@@ -8,6 +8,7 @@ class UbrpcDemoConsumerApplicationTests {
 
     @Test
     void contextLoads() {
+
     }
 
 }
