@@ -7,6 +7,7 @@ import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.filter.CacheFilter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
+import io.unbong.ubrpc.core.util.MockFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,9 +54,16 @@ public class ConsumerConfig {
      * @return
      */
     @Bean
-    public Filter filter(){
+    @Order(Integer.MIN_VALUE-1)
+    public Filter cacheFilter(){
         return new CacheFilter();
     }
+
+//    @Bean
+//    @Order(Integer.MIN_VALUE)
+//    public Filter mockFilter(){
+//        return new MockFilter();
+//    }
 
     /**
      * 装配默认负载均衡

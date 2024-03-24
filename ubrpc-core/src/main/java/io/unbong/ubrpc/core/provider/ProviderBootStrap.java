@@ -15,7 +15,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -154,7 +153,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
         ProviderMeta meta = ProviderMeta.builder()
                 .serviceImpl(impl)
                 .method(m)
-                .methodSign(MethodUtil.method(m))
+                .methodSign(MethodUtil.methodSign(m))
                 .build();
         log.info("create a provider: "+meta );
         skeleton.add(service.getCanonicalName(), meta);

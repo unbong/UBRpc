@@ -67,7 +67,7 @@ public class UBInvocationHandler implements InvocationHandler {
 
         RpcRequest rpcRequest = new RpcRequest();
         rpcRequest.setService(service.getCanonicalName());
-        rpcRequest.setMethodSign(MethodUtil.method(method));
+        rpcRequest.setMethodSign(MethodUtil.methodSign(method));
         rpcRequest.setArgs(args);
 
         // filter
@@ -83,7 +83,7 @@ public class UBInvocationHandler implements InvocationHandler {
 
         List<InstanceMeta> instances = _context.getRouter().route(_providers);
         InstanceMeta node = (InstanceMeta) _context.getLoadBalancer().choose(instances);
-        log.debug("loadBlancer.choose(urls)==>  " + node.toURL());
+        log.debug("loadBalancer.choose(urls)==>  " + node.toURL());
         String url = node.toURL();
         RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, url);
 
@@ -91,7 +91,6 @@ public class UBInvocationHandler implements InvocationHandler {
 
         for (Filter filter : _context.getFilters()) {
             result =filter.postFilter(rpcRequest, rpcResponse, result);
-
         }
 
         return result;

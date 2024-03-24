@@ -1,9 +1,6 @@
 package io.unbong.ubrpc.core.util;
 
-import io.unbong.ubrpc.core.annotation.UBConsumer;
-
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,7 +20,7 @@ public class MethodUtil {
      * @param method
      * @return
      */
-    public static String method(Method method)
+    public static String methodSign(Method method)
     {
         StringBuilder sb = new StringBuilder(method.getName());
         sb.append("@").append(method.getParameterCount());
