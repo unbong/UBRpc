@@ -18,6 +18,8 @@
         <maven.compiler.target>17</maven.compiler.target>
         <spring.boot.version>3.2.3</spring.boot.version>
     </properties>
+
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -76,6 +78,28 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <!--                目的是打成fat jar-->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.3</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit-platform</artifactId>
+                        <version>3.2.3</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
