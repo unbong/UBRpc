@@ -133,7 +133,7 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
 
 
     /**
-     * 通过 动态代理 bytebuddy
+     * 创建动态代理
      *
      * @param service
      * @param providers

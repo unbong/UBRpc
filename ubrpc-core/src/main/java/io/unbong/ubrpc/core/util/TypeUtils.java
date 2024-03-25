@@ -2,15 +2,14 @@ package io.unbong.ubrpc.core.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Description
@@ -19,6 +18,7 @@ import java.util.List;
  * @author <a href="ecunbong@gmail.com">unbong</a>
  * 2024-03-13 21:52
  */
+@Slf4j
 public class TypeUtils {
 
     public static Object cast(Object origin, Class<?> type)
@@ -112,22 +112,76 @@ public class TypeUtils {
 
     @Nullable
     public static   Object castMethodReturnType(Method method, Object rpcData) {
-        if(rpcData instanceof JSONObject)
+
+
+        Class<?> returnType = method.getReturnType();
+        log.debug("---> method.getReturnType : "+returnType.toString());
+        if(rpcData instanceof JSONObject jsonResult)
         {
+            if(Map.class.isAssignableFrom(returnType))
+            {
+                Map resultMap = new HashMap();
+                Type genericReturnType = method.getGenericReturnType();
+                log.debug("method.getGenericReturnType :" + genericReturnType);
+
+                if(genericReturnType instanceof ParameterizedType parameterizedType){
+                    Class<?> keyType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                    Class<?> valueType =(Class<?>) parameterizedType.getActualTypeArguments()[1];
+                    log.debug("keyType : "+ keyType);
+                    log.debug("valueType: " + valueType);
+                    jsonResult.entrySet().stream().forEach(
+                            e->{
+                                Object key = TypeUtils.cast(e.getKey(), keyType);
+                                Object value = TypeUtils.cast(e.getValue(), valueType);
+                                resultMap.put(key, value);
+                            }
+                    );
+                    return resultMap;
+                }
+
+            }
             JSONObject data = (JSONObject) rpcData;
             return data.toJavaObject(method.getReturnType());
         }else if(rpcData instanceof JSONArray jsonArray)
         {
             // 数组类型的反序列化操作
             Object[] array = jsonArray.toArray();
-            // 返回数组的类型 仅仅是类型
-            Class<?> componentType = method.getReturnType().getComponentType();
+            if(returnType.isArray()){
+                // 返回数组的类型 仅仅是类型
+                Class<?> componentType = returnType.getComponentType();
 
-            Object resultArray  = Array.newInstance(componentType, array.length);
-            for (int i = 0; i < array.length; i++) {
-                Array.set(resultArray, i, array[i]);
+                Object resultArray  = Array.newInstance(componentType, array.length);
+                for (int i = 0; i < array.length; i++) {
+                    if(componentType.isPrimitive() || componentType.getPackageName().startsWith("java"))
+                    {
+                        Array.set(resultArray, i, array[i]);
+                    }
+                    else
+                    {
+                        Object castObject = cast(array[i], componentType);
+                        Array.set(resultArray,i, castObject);
+                    }
+
+                }
+                return resultArray;
             }
-            return resultArray;
+            else if(List.class.isAssignableFrom(returnType))
+            {
+                List<Object> resultList = new ArrayList<>();
+                Type genericReturnType = method.getGenericReturnType();
+                log.debug("genericType: " + genericReturnType);
+                if(genericReturnType instanceof ParameterizedType parameterizedType){
+                    Type actualType = parameterizedType.getActualTypeArguments()[0];
+                    log.debug("actualType: "+actualType);
+                    for(Object o: array){
+                        resultList.add(cast(o, (Class<?>)actualType));
+                    }
+                }
+                else{
+                    resultList.addAll(Arrays.asList(array));
+                }
+                return resultList;
+            }
         }
 
         // ub JSONObject to
