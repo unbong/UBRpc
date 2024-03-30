@@ -72,6 +72,7 @@ public class UBInvocationHandler implements InvocationHandler {
         rpcRequest.setService(service.getCanonicalName());
         rpcRequest.setMethodSign(MethodUtil.methodSign(method));
         rpcRequest.setArgs(args);
+        rpcRequest.setParameters(_context.getParamaters());
 
         int retries = Integer.valueOf( _context.getParamaters().getOrDefault("app.retries", "1"));
 
@@ -136,7 +137,7 @@ public class UBInvocationHandler implements InvocationHandler {
                 throw exception;
             }
 
-            throw new RpcException(ex, RpcException.Unknown);
+            throw new RpcException(ex, ErrorCode.UNKNOWN);
         }
     }
 }

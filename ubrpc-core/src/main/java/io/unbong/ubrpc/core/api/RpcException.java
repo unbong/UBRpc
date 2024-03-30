@@ -14,9 +14,9 @@ public class RpcException extends RuntimeException {
     // x-> 技术类异常
     // y-> 业务类异常
     // z-> unknown 暂时搞不清楚，再归类到x或y
-    public static final String SocketTimeoutEx = "x001"+"-"+ "http_invoke_timeout.";
-    public static final String NoSuchMethodEx = "x002"+"-"+ "method_no_exist.";
-    public static final String Unknown = "z002"+"-"+ "unknown.";
+//    public static final String SocketTimeoutEx = "x001"+"-"+ "http_invoke_timeout.";
+//    public static final String NoSuchMethodEx = "x002"+"-"+ "method_no_exist.";
+//    public static final String Unknown = "z002"+"-"+ "unknown.";
 
 
     private String errorCode;
@@ -36,9 +36,9 @@ public class RpcException extends RuntimeException {
         super(cause);
     }
 
-    public RpcException(Throwable cause, String errorCode){
+    public RpcException(Throwable cause, ErrorCode errorCode){
         super(cause);
-        this.errorCode = errorCode;
+        this.errorCode = errorCode.toString();
     }
 
     public RpcException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
