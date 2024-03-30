@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
         if (id == 404){
             throw new RuntimeException("404 exception");
         }
-
+        
         return new User(100, "ubnong: " +environment.getProperty("server.port")
                 + "_" + System.currentTimeMillis());
     }

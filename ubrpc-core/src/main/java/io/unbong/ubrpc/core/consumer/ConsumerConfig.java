@@ -44,6 +44,7 @@ public class ConsumerConfig {
     public ApplicationRunner consumer_runner(@Autowired ConsumerBootStrap consumerBootStrap){
         return x->{
             log.info("consumerBootStrap starting..." );
+
             consumerBootStrap.start();
             log.info("consumerBootStrap started ..." );
         };

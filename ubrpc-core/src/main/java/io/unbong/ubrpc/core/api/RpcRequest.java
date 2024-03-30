@@ -3,6 +3,8 @@ package io.unbong.ubrpc.core.api;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Map;
+
 /**
  * todo
  *
@@ -14,6 +16,6 @@ public class RpcRequest {
 
     String service;    //io.unbong.ubrpc.demo.api.UserService
     String methodSign;
-
     Object[] args;
+    Map<String, String> parameters;
 }
