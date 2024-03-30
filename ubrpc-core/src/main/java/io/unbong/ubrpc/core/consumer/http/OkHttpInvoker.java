@@ -20,11 +20,15 @@ import java.util.concurrent.TimeUnit;
 public class OkHttpInvoker implements HttpInvoker {
     final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
     OkHttpClient client;
-    public OkHttpInvoker() {
+    //int timeout;
+
+    public OkHttpInvoker(int timeout) {
+
        client  = new OkHttpClient.Builder()
                 .connectionPool(new ConnectionPool(16, 60, TimeUnit.SECONDS))
-                .readTimeout(100,TimeUnit.SECONDS)
-                .connectTimeout(1000,TimeUnit.SECONDS )
+                .readTimeout(timeout,TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout,TimeUnit.MILLISECONDS)
+                .connectTimeout(timeout,TimeUnit.MILLISECONDS )
                 .build();
     }
 
@@ -43,7 +47,7 @@ public class OkHttpInvoker implements HttpInvoker {
             log.debug(" ===> respJson = " + resJson);
             RpcResponse<Object> rpcResponse = JSON.parseObject(resJson,RpcResponse.class);
             return rpcResponse;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

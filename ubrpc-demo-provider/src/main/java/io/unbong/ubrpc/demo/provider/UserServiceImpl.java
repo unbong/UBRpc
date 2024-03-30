@@ -34,6 +34,8 @@ public class UserServiceImpl implements UserService {
                 + "_" + System.currentTimeMillis());
     }
 
+
+
     @Override
     public int findId() {
         return 100;
@@ -98,6 +100,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public Map<String, User> getUsers(Map<String, User> users) {
         return users;
+    }
+
+    @Override
+    public User findTw(int timeout) {
+        String port = environment.getProperty("server.port");
+        if("8081".equals(port))
+        {
+            try {
+                Thread.sleep(timeout);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new User(1001, "timeout-"+ port);
     }
 
 }

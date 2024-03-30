@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 /**
@@ -29,12 +30,14 @@ public class UBInvocationHandler implements InvocationHandler {
     RpcContext _context;
     List<InstanceMeta> _providers;
 
-    HttpInvoker httpInvoker = new OkHttpInvoker();
+    HttpInvoker _httpInvoker;
 
     public UBInvocationHandler(Class<?> clazz, RpcContext context, List<InstanceMeta> providers){
         this.service = clazz;
         _context = context;
         _providers = providers;
+        int timeout = Integer.valueOf(context.getParamaters().getOrDefault("app.timeout", "1000"));
+        _httpInvoker = new OkHttpInvoker(timeout);
     }
 
     /**
@@ -70,31 +73,51 @@ public class UBInvocationHandler implements InvocationHandler {
         rpcRequest.setMethodSign(MethodUtil.methodSign(method));
         rpcRequest.setArgs(args);
 
-        // filter
-        for (Filter filter : _context.getFilters()) {
-            Object preResponce =filter.preFilter(rpcRequest);
-            if(preResponce != null)
-            {
-                log.debug(filter.getClass().getName() + "---> preFilter response: " + preResponce);
+        int retries = Integer.valueOf( _context.getParamaters().getOrDefault("app.retries", "1"));
 
-                return preResponce;
+
+        while(retries-- > 0)
+        {
+            log.info("---> retries: " + retries );
+            try {
+                // filter
+                for (Filter filter : _context.getFilters()) {
+                    Object preResponce =filter.preFilter(rpcRequest);
+                    if(preResponce != null)
+                    {
+                        log.debug(filter.getClass().getName() + "---> preFilter response: " + preResponce);
+
+                        //return preResponce;
+                    }
+                }
+
+
+                List<InstanceMeta> instances = _context.getRouter().route(_providers);
+                InstanceMeta node = (InstanceMeta) _context.getLoadBalancer().choose(instances);
+                log.debug("loadBalancer.choose(urls)==>  " + node.toURL());
+                String url = node.toURL();
+                RpcResponse<?> rpcResponse = _httpInvoker.post(rpcRequest, url);
+                Object result = castReturnResult(method, rpcResponse);
+
+
+                for (Filter filter : _context.getFilters()) {
+                    result =filter.postFilter(rpcRequest, rpcResponse, result);
+                }
+
+                return result;
+//        return null;
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+                if (! (e.getCause() instanceof SocketTimeoutException))
+                {
+                    log.debug("socket timeout happen. retries:" + retries);
+                    throw e;
+                }
             }
         }
 
-        List<InstanceMeta> instances = _context.getRouter().route(_providers);
-        InstanceMeta node = (InstanceMeta) _context.getLoadBalancer().choose(instances);
-        log.debug("loadBalancer.choose(urls)==>  " + node.toURL());
-        String url = node.toURL();
-        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, url);
-
-        Object result = castReturnResult(method, rpcResponse);
-
-        for (Filter filter : _context.getFilters()) {
-            result =filter.postFilter(rpcRequest, rpcResponse, result);
-        }
-
-        return result;
-//        return null;
+        return null ;
     }
 
     @Nullable
@@ -108,8 +131,12 @@ public class UBInvocationHandler implements InvocationHandler {
         else{
             Exception ex = rpcResponse.getException();
             //ex.printStackTrace();
+            if(ex instanceof RpcException exception)
+            {
+                throw exception;
+            }
 
-            throw new RuntimeException(ex);
+            throw new RpcException(ex, RpcException.Unknown);
         }
     }
 }

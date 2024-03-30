@@ -46,6 +46,13 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
     @Value("${app.env}")
     private String env;
 
+    @Value("${app.retries}")
+    private String retries;
+
+    @Value("${app.timeout}")
+    private String timeout;
+
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicatoinContext = applicationContext;
@@ -69,6 +76,9 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
+        context.setParamaters(new HashMap<>());
+        context.getParamaters().put("app.timeout",timeout);
+        context.getParamaters().put("app.retries", retries);
 
 
         String[] names = _applicatoinContext.getBeanDefinitionNames();

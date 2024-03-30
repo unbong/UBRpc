@@ -4,6 +4,7 @@ import io.unbong.ubrpc.core.meta.InstanceMeta;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description
@@ -16,4 +17,5 @@ public class RpcContext {
     List<Filter> filters;
     LoadBalancer<InstanceMeta> loadBalancer;
     Router<InstanceMeta> router;
+    Map<String, String> paramaters;
 }

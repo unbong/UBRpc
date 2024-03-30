@@ -33,4 +33,6 @@ public interface UserService {
     List<User> getUsers(List<User> users);
 
     Map<String , User> getUsers(Map<String, User> users);
+
+    User findTw(int timeout);
 }

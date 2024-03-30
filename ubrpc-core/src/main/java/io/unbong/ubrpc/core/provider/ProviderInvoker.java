@@ -1,5 +1,6 @@
 package io.unbong.ubrpc.core.provider;
 
+import io.unbong.ubrpc.core.api.RpcException;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
 import io.unbong.ubrpc.core.meta.ProviderMeta;
@@ -41,9 +42,9 @@ public class ProviderInvoker {
             rpcResponse.setStatus(true);
 
         } catch (InvocationTargetException e) {
-            rpcResponse.setException(new RuntimeException(e.getTargetException().getMessage()));
+            rpcResponse.setException(new RpcException(e.getTargetException().getMessage()));
         } catch (IllegalAccessException e) {
-            rpcResponse.setException(new RuntimeException(e.getMessage()));
+            rpcResponse.setException(new RpcException(e.getMessage()));
         }
 
         return rpcResponse;

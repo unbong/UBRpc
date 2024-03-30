@@ -1,6 +1,7 @@
 package io.unbong.ubrpc.core.registry.zk;
 
 import io.unbong.ubrpc.core.api.RegistryCenter;
+import io.unbong.ubrpc.core.api.RpcException;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.meta.ServiceMeta;
 import io.unbong.ubrpc.core.registry.ChangedListener;
@@ -84,7 +85,7 @@ public class ZKRegistryCenter implements RegistryCenter {
             log.info("zkregister registered----->" + instance);
         } catch (Exception e) {
 
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
 
     }
@@ -105,7 +106,7 @@ public class ZKRegistryCenter implements RegistryCenter {
             log.info("zkregister unregistered----->" + instance);
         } catch (Exception e) {
 
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -124,7 +125,7 @@ public class ZKRegistryCenter implements RegistryCenter {
 
         } catch (Exception e) {
 
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
 
     }
