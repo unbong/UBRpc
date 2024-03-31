@@ -5,6 +5,7 @@ import io.unbong.ubrpc.core.api.RpcResponse;
 import io.unbong.ubrpc.core.provider.ProviderBootStrap;
 import io.unbong.ubrpc.core.provider.ProviderConfig;
 import io.unbong.ubrpc.core.provider.ProviderInvoker;
+import io.unbong.ubrpc.demo.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -30,6 +32,18 @@ public class UbrpcDemoProviderApplication {
         SpringApplication.run(UbrpcDemoProviderApplication.class, args);
     }
 
+
+    @Autowired
+    UserService userService;
+    @RequestMapping("/ports")
+    public RpcResponse<String> ports(@RequestParam("ports") String ports)
+    {
+        userService.setTimeoutPorts(ports);
+        RpcResponse<String> response = new RpcResponse<>();
+        response.setStatus(true);
+        response.setData("ok: "+ ports);
+        return response;
+    }
 
     @Bean
     ApplicationRunner providerRun() {

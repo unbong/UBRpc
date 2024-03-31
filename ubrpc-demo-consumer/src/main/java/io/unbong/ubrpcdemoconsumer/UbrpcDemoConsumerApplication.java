@@ -50,9 +50,6 @@ public class UbrpcDemoConsumerApplication {
     {
         return x->{
 
-            long start = System.currentTimeMillis();
-//            User user = userService.find(2000);
-//            log.info("userService#find take" + (System.currentTimeMillis() - start)+"ms");
             test();
 
         };
@@ -83,8 +80,14 @@ public class UbrpcDemoConsumerApplication {
 
         log.info(userService.getName(11));
 
-//        User user12 = userService.findById(404);
-//        log.info(user12.toString());
+        try{
+            User user12 = userService.findById(404);
+           log.info(user12.toString());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         User usernull = userService.findByid(null);
         log.info("user null  ====> "+ usernull);
@@ -106,25 +109,31 @@ public class UbrpcDemoConsumerApplication {
             log.info(""+l);
         }
 
-            List<Long> ids = new ArrayList<>();
-            ids.add(1L);
-            ids.add(2L);
-            ids.add(3L);
-            List<Long> list = userService.getIds(ids);
-            //list.forEach(log::info);
+        List<Long> ids = new ArrayList<>();
+        ids.add(1L);
+        ids.add(2L);
+        ids.add(3L);
+        List<Long> list = userService.getIds(ids);
+        //list.forEach(log::info);
 
-            List<User> users = new ArrayList<>();
-            users.add(new User(100,"100"));
-            users.add(new User(101,"101"));
-            users.add(new User(102,"102"));
-            List<User> res1 = userService.getUsers(users);
-            res1.forEach(x->log.info(x.toString()));
+        List<User> users = new ArrayList<>();
+        users.add(new User(100,"100"));
+        users.add(new User(101,"101"));
+        users.add(new User(102,"102"));
+        List<User> res1 = userService.getUsers(users);
+        res1.forEach(x->log.info(x.toString()));
 
-            Map<String, User> userMap= new HashMap<>();
-            userMap.put("one", new User(1,"one"));
-            userMap.put("two", new User(1,"two"));
-            userMap.put("three", new User(1,"three"));
+        Map<String, User> userMap= new HashMap<>();
+        userMap.put("one", new User(1,"one"));
+        userMap.put("two", new User(1,"two"));
+        userMap.put("three", new User(1,"three"));
 
-            userMap.forEach((k,v)->log.info(k+v.toString()));
+        userMap.forEach((k,v)->log.info(k+v.toString()));
+
+
+        long start = System.currentTimeMillis();
+        User userTw = userService.findTw(2000);
+        log.info("userService#find take" + (System.currentTimeMillis() - start)+"ms");
+
     }
 }

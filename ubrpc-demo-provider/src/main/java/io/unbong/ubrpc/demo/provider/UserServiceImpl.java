@@ -3,12 +3,14 @@ package io.unbong.ubrpc.demo.provider;
 import io.unbong.ubrpc.core.annotation.UbProvider;
 import io.unbong.ubrpc.demo.api.User;
 import io.unbong.ubrpc.demo.api.UserService;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +31,7 @@ public class UserServiceImpl implements UserService {
         if (id == 404){
             throw new RuntimeException("404 exception");
         }
-        
+
         return new User(100, "ubnong: " +environment.getProperty("server.port")
                 + "_" + System.currentTimeMillis());
     }
@@ -102,10 +104,12 @@ public class UserServiceImpl implements UserService {
         return users;
     }
 
+
+    String timeoutPorts = "8081,8094";
     @Override
     public User findTw(int timeout) {
         String port = environment.getProperty("server.port");
-        if("8081".equals(port))
+        if(Arrays.stream(timeoutPorts.split(",")).anyMatch(port::equals))
         {
             try {
                 Thread.sleep(timeout);
@@ -116,4 +120,11 @@ public class UserServiceImpl implements UserService {
         return new User(1001, "timeout-"+ port);
     }
 
+    public String getTimeoutPorts() {
+        return timeoutPorts;
+    }
+
+    public void setTimeoutPorts(String timeoutPorts) {
+        this.timeoutPorts = timeoutPorts;
+    }
 }
