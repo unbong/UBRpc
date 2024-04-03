@@ -54,6 +54,9 @@ public class ProviderBootStrap implements ApplicationContextAware {
     @Value("${app.env}")
     private String env;
 
+    @Value("#{${app.metas}}")       //spel
+    Map<String, String> metas;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicationContext = applicationContext;
@@ -69,7 +72,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
         // ip and port
         String ip = InetAddress.getLocalHost().getHostAddress();
         this._instance =InstanceMeta.http(ip, Integer.valueOf(port));
-
+        this._instance.getParameters().putAll(this.metas);
         rc.start();
         // 注册服务列表
         skeleton.keySet().forEach(this::registerService);

@@ -1,9 +1,12 @@
 package io.unbong.ubrpc.core.meta;
 
+import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.zookeeper.StatsTrack;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +35,7 @@ public class InstanceMeta {
     private String context;
 
     private boolean status;     // online offline
-    private Map<String,String> parameters;  // which server room ...
+    private Map<String,String> parameters = new HashMap<>(); // which server room ...
 
     public String toPath() {
         return String.format("%s_%d", host, port);
@@ -44,5 +47,9 @@ public class InstanceMeta {
 
     public String toURL() {
         return String.format("%s://%s:%d/%s",scheme, host, port,context);
+    }
+
+    public String toMetas() {
+        return JSON.toJSONString(this.getParameters());
     }
 }

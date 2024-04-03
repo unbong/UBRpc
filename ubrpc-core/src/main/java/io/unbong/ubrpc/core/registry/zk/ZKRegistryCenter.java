@@ -1,5 +1,6 @@
 package io.unbong.ubrpc.core.registry.zk;
 
+import com.alibaba.fastjson.JSON;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.RpcException;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
@@ -17,7 +18,9 @@ import org.apache.zookeeper.CreateMode;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -81,7 +84,7 @@ public class ZKRegistryCenter implements RegistryCenter {
 
             log.info("zkregister registering----->" + instancePath);
 
-            client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, "provider".getBytes());
+            client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, instance.toMetas().getBytes());
             log.info("zkregister registered----->" + instance);
         } catch (Exception e) {
 
@@ -120,7 +123,7 @@ public class ZKRegistryCenter implements RegistryCenter {
             log.info("fetch ALL from zk" +serverPath);
             nodes.forEach(log::info);
 
-            List<InstanceMeta> providers = mapInstance(nodes);
+            List<InstanceMeta> providers = mapInstance(nodes, serverPath);
             return providers;
 
         } catch (Exception e) {
@@ -133,10 +136,27 @@ public class ZKRegistryCenter implements RegistryCenter {
 
 
     @NotNull
-    private static List<InstanceMeta> mapInstance(List<String> nodes) {
+    private  List<InstanceMeta> mapInstance(List<String> nodes, String serverPath) {
         return nodes.stream().map(x->{
+
             String[] ip_port = x.split("_");
-            return InstanceMeta.http(ip_port[0], Integer.valueOf(ip_port[1]));
+            InstanceMeta instanceMeta = InstanceMeta.http(ip_port[0], Integer.valueOf(ip_port[1]));
+
+            // 子节点路径
+            String nodePath = serverPath +"/" + x;
+            // instance node path
+            byte[] bytes;
+            try {
+                bytes = client.getData().forPath(nodePath);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Map<String,String> parameter = JSON.parseObject(new String(bytes), HashMap.class);
+            parameter.forEach((k,v)->{
+                log.debug("{} -> {}", k, v);
+            });
+            instanceMeta.setParameters(parameter);
+            return instanceMeta;
         }).collect(Collectors.toList());
     }
 
