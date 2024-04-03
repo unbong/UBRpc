@@ -76,7 +76,7 @@ public class ZKRegistryCenter implements RegistryCenter {
         try {
             if(client.checkExists().forPath(serverPath) == null){
                 // 创建服务的持久化的节点
-                client.create().withMode(CreateMode.PERSISTENT).forPath(serverPath,"service".getBytes());
+                client.create().withMode(CreateMode.PERSISTENT).forPath(serverPath,service.toMetas().getBytes());
             }
 
             // 创建实例的临时节点
