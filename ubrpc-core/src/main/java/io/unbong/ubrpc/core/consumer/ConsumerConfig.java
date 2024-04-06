@@ -4,6 +4,7 @@ import io.unbong.ubrpc.core.api.Filter;
 import io.unbong.ubrpc.core.api.LoadBalancer;
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
+import io.unbong.ubrpc.core.cluster.GrayRouter;
 import io.unbong.ubrpc.core.filter.CacheFilter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
@@ -28,6 +29,9 @@ public class ConsumerConfig {
 
     @Value("${ubrpc.providers}")
     String servers;
+
+    @Value("${app.grayRatio}")
+    private int grayRatio;
     @Bean
     public ConsumerBootStrap createConsumerBootStrap(){
         return new ConsumerBootStrap();
@@ -81,7 +85,7 @@ public class ConsumerConfig {
      */
     @Bean
     public Router<InstanceMeta> router(){
-        return Router.Default;
+        return new GrayRouter(grayRatio);
     }
 
     /**

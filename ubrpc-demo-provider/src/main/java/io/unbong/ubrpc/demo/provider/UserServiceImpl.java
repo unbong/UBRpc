@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("404 exception");
         }
 
-        return new User(100, "ubnong: " +environment.getProperty("server.port")
+        return new User(100, "ubnong:  -  v10 " +environment.getProperty("server.port")
                 + "_" + System.currentTimeMillis());
     }
 

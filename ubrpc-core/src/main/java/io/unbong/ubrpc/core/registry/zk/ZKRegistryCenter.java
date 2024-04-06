@@ -45,7 +45,6 @@ public class ZKRegistryCenter implements RegistryCenter {
     @Value("${ubrpc.zkRoot}")
     private String root;
 
-
     @Override
     public void start() {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);

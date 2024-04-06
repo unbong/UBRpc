@@ -1,0 +1,23 @@
+server:
+  port: 8088
+
+ubrpc:
+  providers: http://localhost:8081/,http://localhost:8082/,http://localhost:8083/
+  zkServer: localhost:12181
+  zkRoot: Ubrpc
+
+
+app:
+  id: app1
+  namespace: public
+  env: dev
+  retries: 2
+  timeout: 1000
+  grayRatio: 10    # 0-100  0 no gray  100 all gray
+
+
+logging:
+  level:
+    root: info
+    io.unbong: debug
+

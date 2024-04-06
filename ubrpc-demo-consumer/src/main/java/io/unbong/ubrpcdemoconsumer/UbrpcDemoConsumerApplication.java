@@ -1,10 +1,14 @@
 package io.unbong.ubrpcdemoconsumer;
 
 import io.unbong.ubrpc.core.annotation.UBConsumer;
+import io.unbong.ubrpc.core.api.Router;
+import io.unbong.ubrpc.core.api.RpcContext;
+import io.unbong.ubrpc.core.cluster.GrayRouter;
 import io.unbong.ubrpc.core.consumer.ConsumerConfig;
 import io.unbong.ubrpc.demo.api.User;
 import io.unbong.ubrpc.demo.api.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,15 +29,23 @@ import java.util.Map;
 @Slf4j
 public class UbrpcDemoConsumerApplication {
 
-
     @UBConsumer
     UserService userService;
 
+    @Autowired
+    Router router;
+
     @RequestMapping("/")
-    public User invoke(int id){
+    public User invoke(@RequestParam("id")int id){
         return userService.findById(id);
     }
 
+    @RequestMapping("/garay/")
+    public String grayRatio(@RequestParam("ratio") int ratio){
+
+        ((GrayRouter)router).setGrayRatio(ratio);
+        return  "gray ratio is "+ ratio;
+    }
     @RequestMapping("/find/")
     public User find(@RequestParam("timeout") String timeout){
 
