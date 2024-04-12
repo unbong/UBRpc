@@ -8,6 +8,7 @@ import io.unbong.ubrpc.core.util.TypeUtils;
 import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,14 +41,16 @@ public class ProviderInvoker {
         try {
 
             ProviderMeta meta = findProviderMeta(providerMetas, request.getMethodSign());
-            Object[] args = processArgs(request.getArgs(), meta.getMethod().getParameterTypes());
+            Object[] args = processArgs(request.getArgs(), meta.getMethod().getParameterTypes(), meta.getMethod().getGenericReturnType());
             Object result = meta.getMethod().invoke(meta.getServiceImpl(),args);
             rpcResponse.setData(result);
             rpcResponse.setStatus(true);
 
         } catch (InvocationTargetException e) {
+            e.printStackTrace();        // todo delete
             rpcResponse.setException(new RpcException(e.getTargetException().getMessage()));
         } catch (IllegalAccessException e) {
+            e.printStackTrace();        // todo delete
             rpcResponse.setException(new RpcException(e.getMessage()));
         }
 
@@ -61,12 +64,12 @@ public class ProviderInvoker {
      * @param parameterTypes
      * @return
      */
-    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes) {
+    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes, Type genericReturnType) {
 
         if(args == null || args.length == 0) return args;
         Object[] actual = new Object[args.length];
         for(int i = 0; i<actual.length; i++){
-            actual[i] = TypeUtils.cast(args[i], parameterTypes[i]);
+            actual[i] = TypeUtils.castGenericType(args[i], parameterTypes[i], genericReturnType);
         }
         return actual;
     }

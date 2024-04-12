@@ -4,15 +4,13 @@ import io.unbong.ubrpc.core.annotation.UbProvider;
 import io.unbong.ubrpc.demo.api.User;
 import io.unbong.ubrpc.demo.api.UserService;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * todo
@@ -21,6 +19,7 @@ import java.util.Map;
  */
 @Component
 @UbProvider
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -102,6 +101,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public Map<String, User> getUsers(Map<String, User> users) {
         return users;
+    }
+
+    @Override
+    public Map<String, User> getMap(Map<String, User> users) {
+        users.values().forEach(u->{
+            log.debug(" map call {} ",u.getClass().toString());
+        });
+
+        User[] res = users.values().toArray(new User[users.size()]);
+
+        Arrays.stream(res).forEach(System.out::println);
+        users.put("A2024", new User(2024,"KK2024"));
+        Map<String,User> res_map = new HashMap<>();
+        res_map.put("A2024", new User(2024,"KK2024"));
+        return res_map;
     }
 
 

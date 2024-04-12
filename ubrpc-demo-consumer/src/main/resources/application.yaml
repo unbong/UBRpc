@@ -11,7 +11,7 @@ app:
   id: app1
   namespace: public
   env: dev
-  retries: 2
+  retries: 1
   timeout: 1000
   grayRatio: 10    # 0-100  0 no gray  100 all gray
 

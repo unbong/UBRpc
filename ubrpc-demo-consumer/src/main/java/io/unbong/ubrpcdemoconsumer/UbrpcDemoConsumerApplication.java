@@ -52,6 +52,26 @@ public class UbrpcDemoConsumerApplication {
         return userService.findTw(Integer.valueOf(timeout).intValue());
     }
 
+    @RequestMapping("/test/")
+    public String testData(){
+        test1();
+        return "ok";
+    }
+
+    private void test1(){
+        long ul = userService.getId(new User(101, "unbong"));
+        log.info("getId(user) "+ ul);
+
+        log.info("test getMap.");
+        Map<String, User> user_map= new HashMap<>();
+        user_map.put("one", new User(1,"one"));
+        Map<String, User> res_getMap = userService.getMap(user_map);
+
+        res_getMap.forEach((k,v)->{
+            log.info("key: {}, value: {}", k, v);
+        });
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(UbrpcDemoConsumerApplication.class, args);
     }
@@ -62,10 +82,20 @@ public class UbrpcDemoConsumerApplication {
     {
         return x->{
 
+
+//            log.info("test getMap.");
+//            Map<String, User> user_map= new HashMap<>();
+//            user_map.put("one", new User(1,"one"));
+//            Map<String, User> res_getMap = userService.getMap(user_map);
+//
+//            res_getMap.forEach((k,v)->{
+//                log.info("key: {}, value: {}", k, v);
+//            });
             test();
 
         };
     }
+
 
     private void test() {
         log.info("consumer application running");
@@ -98,7 +128,7 @@ public class UbrpcDemoConsumerApplication {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+           log.error("exception test case {}", e.getCause().getMessage());
         }
 
         User usernull = userService.findByid(null);
@@ -146,6 +176,16 @@ public class UbrpcDemoConsumerApplication {
         long start = System.currentTimeMillis();
         User userTw = userService.findTw(2000);
         log.info("userService#find take" + (System.currentTimeMillis() - start)+"ms");
+
+
+        log.info("test getMap.");
+        Map<String, User> user_map= new HashMap<>();
+        user_map.put("one", new User(1,"one"));
+        Map<String, User> res_getMap = userService.getMap(user_map);
+
+        res_getMap.forEach((k,v)->{
+            log.info("key: {}, value: {}", k, v);
+        });
 
     }
 }
