@@ -122,7 +122,7 @@ public class UbrpcDemoConsumerApplication {
         }
         catch (Exception e)
         {
-           log.error("exception test case {}", e.getCause().getMessage());
+           log.error("exception test case {}", e.getMessage());
         }
 
         User usernull = userService.findByid(null);

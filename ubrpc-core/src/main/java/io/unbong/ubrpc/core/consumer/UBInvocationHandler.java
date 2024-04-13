@@ -198,14 +198,15 @@ public class UBInvocationHandler implements InvocationHandler {
             return TypeUtils.castMethodReturnType(method, rpcData);
         }
         else{
-            Exception ex = rpcResponse.getException();
+            RpcException ex = rpcResponse.getException();
             //ex.printStackTrace();
-            if(ex instanceof RpcException exception)
+            if(ex != null)
             {
-                throw exception;
+                log.error("response error.", ex);
+                throw ex;
             }
 
-            throw new RpcException(ex, ErrorCode.UNKNOWN);
+            return null;
         }
     }
 }

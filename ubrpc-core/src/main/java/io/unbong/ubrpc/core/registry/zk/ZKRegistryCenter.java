@@ -38,11 +38,10 @@ public class ZKRegistryCenter implements RegistryCenter {
 
     private CuratorFramework client = null;
 
-
-    @Value("${ubrpc.zkServer}")
+    @Value("${ubrpc.zkServer:localhost:12181}")
     private String server;
 
-    @Value("${ubrpc.zkRoot}")
+    @Value("${ubrpc.zkRoot:Ubrpc}")
     private String root;
 
     @Override
