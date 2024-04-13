@@ -35,21 +35,6 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
     ApplicationContext _applicatoinContext ;
     Environment _environment;
 
-
-    @Value("${app.id}")
-    private String app;
-    @Value("${app.namespace}")
-    private String namespace;
-    @Value("${app.env}")
-    private String env;
-
-    @Value("${app.retries}")
-    private String retries;
-
-    @Value("${app.timeout}")
-    private String timeout;
-
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         _applicatoinContext = applicationContext;
@@ -69,13 +54,13 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
         List<Filter> filters  = _applicatoinContext.getBeansOfType(Filter.class).
                         values().stream().toList();
 
-        RpcContext context = new RpcContext();
+        RpcContext context = _applicatoinContext.getBean(RpcContext.class);
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
-        context.setParameters(new HashMap<>());
-        context.getParameters().put("app.timeout",timeout);
-        context.getParameters().put("app.retries", retries);
+//        context.setParameters(new HashMap<>());
+//        context.getParameters().put("app.timeout",timeout);
+//        context.getParameters().put("app.retries", retries);
 
         String[] names = _applicatoinContext.getBeanDefinitionNames();
         for(String name : names){
@@ -110,18 +95,18 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
     /**
      * 处理服务与Consumer的关系
      * @param service
-     * @param context
+     * @param rpcContext
      * @param rc
      * @return
      */
-    private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
+    private Object createConsumerFromRegistry(Class<?> service, RpcContext rpcContext, RegistryCenter rc) {
         String serviceName = service.getCanonicalName();
 
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(serviceName)
-                .app(this.app)
-                .namespace(this.namespace)
-                .env(this.env)
+                .app(rpcContext.getParameter("app.id"))
+                .namespace(rpcContext.getParameter("app.namespace"))
+                .env(rpcContext.getParameter("app.env"))
                 .build();
         List<InstanceMeta> providers = rc.fetchAll(serviceMeta);
 
@@ -133,7 +118,7 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
                 providers.addAll(event.getData());
             }
         });
-        return createConsumerProxy(service, context, providers);
+        return createConsumerProxy(service, rpcContext, providers);
     }
 
 

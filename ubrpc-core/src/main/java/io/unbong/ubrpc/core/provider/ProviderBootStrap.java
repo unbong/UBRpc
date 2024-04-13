@@ -36,26 +36,26 @@ import java.util.Map;
 @Slf4j
 public class ProviderBootStrap implements ApplicationContextAware {
 
-    ApplicationContext _applicationContext ;
+    private ApplicationContext _applicationContext ;
+    private String port;
+    private String app;
+    private String namespace;
+    private String env;
+    private Map<String, String> metas;
+
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
     private InstanceMeta _instance;
 
     RegistryCenter rc;
 
-
-    @Value("${server.port}")
-    private String port;
-
-
-    @Value("${app.id}")
-    private String app;
-    @Value("${app.namespace}")
-    private String namespace;
-    @Value("${app.env}")
-    private String env;
-
-    @Value("#{${app.metas}}")       //spel
-    Map<String, String> metas;
+    public ProviderBootStrap(String port, String app, String namespace,
+                             String env, Map<String, String> metas) {
+        this.port = port;
+        this.app = app;
+        this.namespace = namespace;
+        this.env = env;
+        this.metas = metas;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

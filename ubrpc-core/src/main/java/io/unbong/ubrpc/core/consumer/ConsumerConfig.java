@@ -1,9 +1,6 @@
 package io.unbong.ubrpc.core.consumer;
 
-import io.unbong.ubrpc.core.api.Filter;
-import io.unbong.ubrpc.core.api.LoadBalancer;
-import io.unbong.ubrpc.core.api.RegistryCenter;
-import io.unbong.ubrpc.core.api.Router;
+import io.unbong.ubrpc.core.api.*;
 import io.unbong.ubrpc.core.cluster.GrayRouter;
 import io.unbong.ubrpc.core.filter.CacheFilter;
 import io.unbong.ubrpc.core.filter.ParameterFilter;
@@ -16,6 +13,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+
+import java.util.List;
 
 /**
  * Description
@@ -30,8 +29,32 @@ public class ConsumerConfig {
     @Value("${ubrpc.providers}")
     String servers;
 
-    @Value("${app.grayRatio}")
+    @Value("${app.grayRatio:0}")
     private int grayRatio;
+
+
+    @Value("${app.id:app1}")
+    private String app;
+    @Value("${app.namespace:public}")
+    private String namespace;
+    @Value("${app.env:dev}")
+    private String env;
+
+    @Value("${app.retries:1}")
+    private String retries;
+
+    @Value("${app.timeout:1000}")
+    private String timeout;
+
+    @Value("${app.faultLimit:10}")
+    private int faultLimit;
+
+    @Value("${app.halfOpenInitialDelay:10000}")
+    private int halfOpenInitialDelay;
+
+    @Value("${app.halfOpenDelay:60000}")
+    private int halfOpenDelay;
+
     @Bean
     public ConsumerBootStrap createConsumerBootStrap(){
         return new ConsumerBootStrap();
@@ -103,4 +126,30 @@ public class ConsumerConfig {
     }
 
 
+    /**
+     * 创建RpcContextBean
+     *  在启动Spring时读取完配置，并写入到RpcContext中并且
+     * @param router
+     * @param loadBalancer
+     * @param filters
+     * @return
+     */
+    @Bean
+    public RpcContext createContext(@Autowired Router router,
+                                    @Autowired LoadBalancer loadBalancer,
+                                    @Autowired List<Filter> filters) {
+        RpcContext context = new RpcContext();
+        context.setRouter(router);
+        context.setLoadBalancer(loadBalancer);
+        context.setFilters(filters);
+        context.getParameters().put("app.id", app);
+        context.getParameters().put("app.namespace", namespace);
+        context.getParameters().put("app.env", env);
+        context.getParameters().put("app.retries", String.valueOf(retries));
+        context.getParameters().put("app.timeout", String.valueOf(timeout));
+        context.getParameters().put("app.halfOpenInitialDelay", String.valueOf(halfOpenInitialDelay));
+        context.getParameters().put("app.faultLimit", String.valueOf(faultLimit));
+        context.getParameters().put("app.halfOpenDelay", String.valueOf(halfOpenDelay));
+        return context;
+    }
 }

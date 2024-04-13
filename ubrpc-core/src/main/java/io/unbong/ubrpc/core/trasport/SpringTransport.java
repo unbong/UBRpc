@@ -23,7 +23,7 @@ public class SpringTransport {
     @Autowired
     ProviderInvoker providerInvoker;
 
-    @RequestMapping("/ubrpc/")
+    @RequestMapping("/ubrpc")
     public RpcResponse invoke(@RequestBody RpcRequest request){
         return providerInvoker.invoke(request);
     }

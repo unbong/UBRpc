@@ -18,7 +18,12 @@ public class RpcContext {
     List<Filter> filters;
     LoadBalancer<InstanceMeta> loadBalancer;
     Router<InstanceMeta> router;
-    Map<String, String> parameters;
+    Map<String, String> parameters = new HashMap<>();
+
+    public String getParameter(String key){
+        return parameters.get(key);
+    }
+
 
     public static ThreadLocal<Map<String, String>> ContextParameters = new ThreadLocal<>(){
         @Override
