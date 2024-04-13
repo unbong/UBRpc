@@ -1,6 +1,7 @@
 package io.unbong.ubrpc.demo.provider;
 
 import io.unbong.ubrpc.core.annotation.UbProvider;
+import io.unbong.ubrpc.core.api.RpcContext;
 import io.unbong.ubrpc.demo.api.User;
 import io.unbong.ubrpc.demo.api.UserService;
 import lombok.Setter;
@@ -140,5 +141,14 @@ public class UserServiceImpl implements UserService {
 
     public void setTimeoutPorts(String timeoutPorts) {
         this.timeoutPorts = timeoutPorts;
+    }
+
+    @Override
+    public String echoParameter(String key) {
+
+        RpcContext.ContextParameters.get().forEach((k,v)->{
+            log.info("context param key: {}, value: {}", k, v);
+        });
+        return RpcContext.getContextParameter(key);
     }
 }

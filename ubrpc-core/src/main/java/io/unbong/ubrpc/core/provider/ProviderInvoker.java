@@ -1,5 +1,6 @@
 package io.unbong.ubrpc.core.provider;
 
+import io.unbong.ubrpc.core.api.RpcContext;
 import io.unbong.ubrpc.core.api.RpcException;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
@@ -34,10 +35,16 @@ public class ProviderInvoker {
         // 在skeleton中找到 对应的bean
 //        Object bean = skeleton.get(request.getService());
         List<ProviderMeta> providerMetas = skeleton.get(request.getService());
-//        for(Map.Entry <String,String> params :request.getParameters().entrySet())
-//        {
-//            System.out.println(params.toString());
-//        }
+
+        //
+        if(request.getParameters()!=null)
+        {
+            for(Map.Entry <String,String> params :request.getParameters().entrySet())
+            {
+                RpcContext.setContextParameter(params.getKey(), params.getValue());
+            }
+        }
+
         try {
 
             ProviderMeta meta = findProviderMeta(providerMetas, request.getMethodSign());
@@ -52,6 +59,9 @@ public class ProviderInvoker {
         } catch (IllegalAccessException e) {
             e.printStackTrace();        // todo delete
             rpcResponse.setException(new RpcException(e.getMessage()));
+        }
+        finally {
+            RpcContext.ContextParameters.get().clear();
         }
 
         return rpcResponse;

@@ -6,6 +6,7 @@ import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.cluster.GrayRouter;
 import io.unbong.ubrpc.core.filter.CacheFilter;
+import io.unbong.ubrpc.core.filter.ParameterFilter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
@@ -57,10 +58,15 @@ public class ConsumerConfig {
      * 缓存过滤器
      * @return
      */
+//    @Bean
+//    @Order(Integer.MIN_VALUE-1)
+//    public Filter cacheFilter(){
+//        return Filter.Default;
+//    }
+
     @Bean
-    @Order(Integer.MIN_VALUE-1)
-    public Filter cacheFilter(){
-        return new CacheFilter();
+    public Filter defaultFilter(){
+        return  new ParameterFilter();
     }
 
 //    @Bean

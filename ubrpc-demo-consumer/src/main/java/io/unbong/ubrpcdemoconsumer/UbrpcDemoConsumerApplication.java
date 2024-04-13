@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SpringBootApplication
 @Import({ConsumerConfig.class})
@@ -52,6 +49,8 @@ public class UbrpcDemoConsumerApplication {
         return userService.findTw(Integer.valueOf(timeout).intValue());
     }
 
+
+
     @RequestMapping("/test/")
     public String testData(){
         test1();
@@ -59,17 +58,12 @@ public class UbrpcDemoConsumerApplication {
     }
 
     private void test1(){
-        long ul = userService.getId(new User(101, "unbong"));
-        log.info("getId(user) "+ ul);
-
-        log.info("test getMap.");
-        Map<String, User> user_map= new HashMap<>();
-        user_map.put("one", new User(1,"one"));
-        Map<String, User> res_getMap = userService.getMap(user_map);
-
-        res_getMap.forEach((k,v)->{
-            log.info("key: {}, value: {}", k, v);
-        });
+        Random r = new Random();
+        int a = r.nextInt(200000);
+        String tName = Thread.currentThread().getName();
+        tName = tName + a;
+        RpcContext.setContextParameter(tName, tName);
+        userService.echoParameter(tName);
     }
 
     public static void main(String[] args) {
@@ -186,6 +180,12 @@ public class UbrpcDemoConsumerApplication {
         res_getMap.forEach((k,v)->{
             log.info("key: {}, value: {}", k, v);
         });
+
+        log.info("test context param");
+        RpcContext.setContextParameter("app.version", "v1.0");
+        RpcContext.setContextParameter("name", "unbong");
+        String echo =userService.echoParameter("name");
+        log.info("exp: {}, real: {}", "unbong", echo);
 
     }
 }

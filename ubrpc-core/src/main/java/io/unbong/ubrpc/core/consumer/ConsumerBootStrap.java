@@ -9,7 +9,6 @@ import io.unbong.ubrpc.core.registry.Event;
 import io.unbong.ubrpc.core.util.MethodUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -19,11 +18,9 @@ import org.springframework.core.env.Environment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Description
@@ -76,9 +73,9 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
-        context.setParamaters(new HashMap<>());
-        context.getParamaters().put("app.timeout",timeout);
-        context.getParamaters().put("app.retries", retries);
+        context.setParameters(new HashMap<>());
+        context.getParameters().put("app.timeout",timeout);
+        context.getParameters().put("app.retries", retries);
 
         String[] names = _applicatoinContext.getBeanDefinitionNames();
         for(String name : names){

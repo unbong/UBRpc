@@ -49,7 +49,7 @@ public class UBInvocationHandler implements InvocationHandler {
         this.service = clazz;
         _context = context;
         _providers = providers;
-        int timeout = Integer.valueOf(context.getParamaters().getOrDefault("app.timeout", "1000"));
+        int timeout = Integer.valueOf(context.getParameters().getOrDefault("app.timeout", "1000"));
         _httpInvoker = new OkHttpInvoker(timeout);
         _executor = Executors.newScheduledThreadPool(1);
         _executor.scheduleWithFixedDelay(this::halfOpen, 10, 60, TimeUnit.SECONDS);
@@ -57,28 +57,13 @@ public class UBInvocationHandler implements InvocationHandler {
 
     private void halfOpen() {
 
-        log.debug("---> half open isolatedProviders" + _isolateProviders);
+        log.debug("---> half open isolatedProviders {}" ,_isolateProviders);
         _halfProviders.clear();
         _halfProviders.addAll(_isolateProviders);
     }
 
     /**
      *   动态代理的代理类，
-     * @param proxy the proxy instance that the method was invoked on
-     *
-     * @param method the {@code Method} instance corresponding to
-     * the interface method invoked on the proxy instance.  The declaring
-     * class of the {@code Method} object will be the interface that
-     * the method was declared in, which may be a superinterface of the
-     * proxy interface that the proxy class inherits the method through.
-     *
-     * @param args an array of objects containing the values of the
-     * arguments passed in the method invocation on the proxy instance,
-     * or {@code null} if interface method takes no arguments.
-     * Arguments of primitive types are wrapped in instances of the
-     * appropriate primitive wrapper class, such as
-     * {@code java.lang.Integer} or {@code java.lang.Boolean}.
-     *
      * @return
      * @throws Throwable
      */
@@ -94,10 +79,9 @@ public class UBInvocationHandler implements InvocationHandler {
         rpcRequest.setService(service.getCanonicalName());
         rpcRequest.setMethodSign(MethodUtil.methodSign(method));
         rpcRequest.setArgs(args);
-        rpcRequest.setParameters(_context.getParamaters());
+        // rpcRequest.setParameters(_context.getParamaters());
 
-        int retries = Integer.valueOf( _context.getParamaters().getOrDefault("app.retries", "1"));
-
+        int retries = Integer.valueOf( _context.getParameters().getOrDefault("app.retries", "1"));
 
         while(retries-- > 0)
         {
@@ -110,7 +94,7 @@ public class UBInvocationHandler implements InvocationHandler {
                     {
                         log.debug(filter.getClass().getName() + "---> preFilter response: " + preResponce);
 
-                        //return preResponce;
+                        return preResponce;
                     }
                 }
 
@@ -171,11 +155,13 @@ public class UBInvocationHandler implements InvocationHandler {
                 }
 
                 for (Filter filter : _context.getFilters()) {
-                    result =filter.postFilter(rpcRequest, rpcResponse, result);
+                    Object filterResult =filter.postFilter(rpcRequest, rpcResponse, result);
+                    if(filterResult != null){
+                        return filterResult;
+                    }
                 }
 
                 return result;
-//        return null;
             }catch (Exception e)
             {
                 e.printStackTrace();
