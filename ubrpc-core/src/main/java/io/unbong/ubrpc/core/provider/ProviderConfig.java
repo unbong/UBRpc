@@ -2,11 +2,13 @@ package io.unbong.ubrpc.core.provider;
 
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
+import io.unbong.ubrpc.core.trasport.SpringTransport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 
 /**
@@ -17,6 +19,7 @@ import org.springframework.core.annotation.Order;
 
 @Configuration
 @Slf4j
+@Import({SpringTransport.class})
 public class ProviderConfig {
 
     @Bean

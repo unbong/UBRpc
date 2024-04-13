@@ -1,6 +1,6 @@
 
 ### 获取用户信息
-POST http://localhost:8082/
+POST http://localhost:8082/ubprc/
 Content-Type: application/json
 
 {
@@ -10,22 +10,22 @@ Content-Type: application/json
 }
 
 ### 获取订单信息
-POST http://localhost:8081/
+POST http://localhost:8081/ubprc/
 Content-Type: application/json
 
 {
   "service": "io.unbong.ubrpc.demo.api.UserService",
-  "method": "findById",
+  "methodSign": "findById@1_int",
   "args": [200]
 }
 
 ### mock2
-POST http://localhost:8080/
+POST http://localhost:8080
 Content-Type: application/json
 
 {
   "service": "io.unbong.ubrpc.demo.api.UserService",
-  "method": "hashCode",
+  "methodSign": "hashCode@0",
   "args": []
 }
 
