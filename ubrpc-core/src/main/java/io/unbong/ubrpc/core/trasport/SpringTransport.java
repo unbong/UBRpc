@@ -4,7 +4,6 @@ import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
 import io.unbong.ubrpc.core.provider.ProviderInvoker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

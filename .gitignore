@@ -40,3 +40,4 @@ build/
 **/client_exec/**
 /ubrpc-comsumer-ubnong/
 /ubrpc-core/src/main/java/io/unbong/ubrpc/core/client_exec/
+*.flattened-pom.xml
