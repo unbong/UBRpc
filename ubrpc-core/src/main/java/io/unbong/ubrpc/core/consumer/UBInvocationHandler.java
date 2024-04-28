@@ -34,8 +34,8 @@ public class UBInvocationHandler implements InvocationHandler {
 
     final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
     Class<?> service ;
-    RpcContext _context;
-    final List<InstanceMeta> _providers;
+    RpcContext context;
+    final List<InstanceMeta> providers;
     List<InstanceMeta> _isolateProviders = new ArrayList<>();
     final List<InstanceMeta> _halfProviders = new ArrayList<>();
     HttpInvoker _httpInvoker;
@@ -47,8 +47,8 @@ public class UBInvocationHandler implements InvocationHandler {
 
     public UBInvocationHandler(Class<?> clazz, RpcContext context, List<InstanceMeta> providers){
         this.service = clazz;
-        _context = context;
-        _providers = providers;
+        this.context = context;
+        this.providers = providers;
         int timeout = Integer.valueOf(context.getParameters().getOrDefault("app.timeout", "1000"));
         _httpInvoker = new OkHttpInvoker(timeout);
         _executor = Executors.newScheduledThreadPool(1);
@@ -81,14 +81,14 @@ public class UBInvocationHandler implements InvocationHandler {
         rpcRequest.setArgs(args);
         // rpcRequest.setParameters(_context.getParamaters());
 
-        int retries = Integer.valueOf( _context.getParameters().getOrDefault("app.retries", "1"));
+        int retries = Integer.valueOf( context.getParameters().getOrDefault("app.retries", "1"));
 
         while(retries-- > 0)
         {
             log.info("---> retries: " + retries );
             try {
                 // filter
-                for (Filter filter : _context.getFilters()) {
+                for (Filter filter : context.getFilters()) {
                     Object preResponce =filter.preFilter(rpcRequest);
                     if(preResponce != null)
                     {
@@ -102,8 +102,8 @@ public class UBInvocationHandler implements InvocationHandler {
                 synchronized (_halfProviders)
                 {
                     if(_halfProviders.isEmpty()){
-                        List<InstanceMeta> instances = _context.getRouter().route(_providers);
-                        instance= (InstanceMeta) _context.getLoadBalancer().choose(instances);
+                        List<InstanceMeta> instances = context.getRouter().route(providers);
+                        instance= (InstanceMeta) context.getLoadBalancer().choose(instances);
                         log.debug("loadBalancer.choose(urls)==>  " + instance.toURL());
                     }
                     else{
@@ -144,17 +144,17 @@ public class UBInvocationHandler implements InvocationHandler {
                     throw exp;
                 }
 
-                synchronized (_providers)
+                synchronized (providers)
                 {
                     // 请求时探活请求时
-                    if(!_providers.contains(instance)){
+                    if(!providers.contains(instance)){
                         _isolateProviders.remove(instance);
-                        _providers.add(instance);
-                        log.debug("instance {} is recovered. isolatedProvider={}, providers={}", instance, _isolateProviders, _providers);
+                        providers.add(instance);
+                        log.debug("instance {} is recovered. isolatedProvider={}, providers={}", instance, _isolateProviders, providers);
                     }
                 }
 
-                for (Filter filter : _context.getFilters()) {
+                for (Filter filter : context.getFilters()) {
                     Object filterResult =filter.postFilter(rpcRequest, rpcResponse, result);
                     if(filterResult != null){
                         return filterResult;
@@ -182,8 +182,8 @@ public class UBInvocationHandler implements InvocationHandler {
      */
     private void isolate(InstanceMeta instance) {
         log.debug("---> isolate instance {}", instance);
-        _providers.remove(instance);
-        log.debug("---> providers ={}", _providers);
+        providers.remove(instance);
+        log.debug("---> providers ={}", providers);
         _isolateProviders.add(instance);
         log.debug("---> isolatedProviders ={}", _isolateProviders);
 

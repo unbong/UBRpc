@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.zookeeper.StatsTrack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,14 +21,14 @@ import java.util.Map;
 @NoArgsConstructor
 public class InstanceMeta {
 
-    public InstanceMeta(String scheme, String host, Integer port, String context ) {
-        this.scheme = scheme;
+    public InstanceMeta(String schema, String host, Integer port, String context ) {
+        this.schema = schema;
         this.host = host;
         this.port = port;
         this.context = context;
     }
 
-    private String scheme;  // protocol default http
+    private String schema;  // protocol default http
     private String host;
     private Integer port;
     private String context;
@@ -46,7 +45,7 @@ public class InstanceMeta {
     }
 
     public String toURL() {
-        return String.format("%s://%s:%d/%s",scheme, host, port,context);
+        return String.format("%s://%s:%d/%s", schema, host, port,context);
     }
 
     public String toMetas() {

@@ -12,7 +12,6 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,7 +35,7 @@ import java.util.Map;
 @Slf4j
 public class ProviderBootStrap implements ApplicationContextAware {
 
-    private ApplicationContext _applicationContext ;
+    private ApplicationContext applicationContext;
     private String port;
     private String app;
     private String namespace;
@@ -59,7 +58,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        _applicationContext = applicationContext;
+        this.applicationContext = applicationContext;
     }
 
     // 为每个服务创建多值的方法元数据
@@ -103,8 +102,8 @@ public class ProviderBootStrap implements ApplicationContextAware {
      */
     @PostConstruct
     public void init(){
-        Map<String, Object> providers = _applicationContext.getBeansWithAnnotation(UbProvider.class);
-        rc = _applicationContext.getBean(RegistryCenter.class);
+        Map<String, Object> providers = applicationContext.getBeansWithAnnotation(UbProvider.class);
+        rc = applicationContext.getBean(RegistryCenter.class);
         // 基于skeleton创建服务列表
         providers.keySet().forEach(log::info);
         providers.values().forEach(v->{

@@ -21,3 +21,6 @@ logging:
     root: info
     io.unbong: debug
 
+ubregistry:
+  servers: http://localhost:8484
+

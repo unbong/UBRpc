@@ -29,7 +29,7 @@ Content-Type: application/json
   "args": []
 }
 
-### get findById
+### get findById  detect which provider executed
 GET http://localhost:8088/?id=100
 
 ### get set gray ratio

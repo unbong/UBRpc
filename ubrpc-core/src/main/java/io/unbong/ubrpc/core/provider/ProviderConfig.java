@@ -1,6 +1,7 @@
 package io.unbong.ubrpc.core.provider;
 
 import io.unbong.ubrpc.core.api.RegistryCenter;
+import io.unbong.ubrpc.core.registry.ub.UbRegistryCenter;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
 import io.unbong.ubrpc.core.trasport.SpringTransport;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +71,8 @@ public class ProviderConfig {
     @Bean //(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter provider_rc()
     {
-        return new ZKRegistryCenter();
+        //return new ZKRegistryCenter();
+        return new UbRegistryCenter();
     }
 
 
