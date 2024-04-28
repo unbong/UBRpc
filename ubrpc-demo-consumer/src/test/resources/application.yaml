@@ -3,17 +3,21 @@ server:
 #ubrpc.providers=http://localhost:8081/
 
 ubrpc:
-  providers: http://localhost:8081/,http://localhost:8082/,http://localhost:8083/
+  #providers: http://localhost:8081/,http://localhost:8082/,http://localhost:8083/
   zkServer: localhost:2182
   zkRoot: Ubrpc
 
-
-app:
-  id: app1
-  namespace: public
-  env: dev
-  retries: 2
-  timeout: 100000
+  app:
+    id: app1
+    namespace: public
+    env: test
+  consumer:
+    retries: 1
+    timeout: 1000
+    grayRatio: 10    # 0-100  0 no gray  100 all
+    faultLimit: 10 # 30s 内10次错误则隔离
+    halfOpenInitialDelay: 10000
+    halfOpenDelay: 60000
 
 
 logging:

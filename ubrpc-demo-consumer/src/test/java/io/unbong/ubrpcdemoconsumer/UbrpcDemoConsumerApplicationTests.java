@@ -35,9 +35,16 @@ class UbrpcDemoConsumerApplicationTests {
         System.out.println(" ====================================== ");
         System.out.println(" ====================================== ");
         context = SpringApplication.run(UbrpcDemoProviderApplication.class,
-                "--server.port=8094", "--kkrpc.zkServer=localhost:2182",
-                "--logging.level.cn.kimmking.kkrpc=info","--ubrpc.zkRoot=Ubrpc"
-                ,"--app.id=app1","--app.namespace=public","--app.env=dev");
+                "--server.port=8094",
+                "--kkrpc.zkServer=localhost:2182",
+                "--logging.level.io.unbong=info",
+                "--ubrpc.zkRoot=Ubrpc"
+                ,"--ubrpc.app.id=app1",
+                "--ubrpc.app.namespace=public",
+                "--ubrpc.app.env=dev",
+                "--ubrpc.provider.metas.dc=bj",
+                "--ubrpc.provider.metas.gray=false",
+                "--ubrpc.provider.metas.unit=B001");
 
         System.out.println(" ====================================== ");
         System.out.println(" ====================================== ");
@@ -46,9 +53,16 @@ class UbrpcDemoConsumerApplicationTests {
         System.out.println(" ====================================== ");
 
         context2 = SpringApplication.run(UbrpcDemoProviderApplication.class,
-                "--server.port=8095", "--kkrpc.zkServer=localhost:2182",
-                "--logging.level.cn.kimmking.kkrpc=info","--ubrpc.zkRoot=Ubrpc"
-                ,"--app.id=app1","--app.namespace=public","--app.env=dev");
+                "--server.port=8095",
+                "--kkrpc.zkServer=localhost:2182",
+                "--logging.level.io.unbong=info",
+                "--ubrpc.zkRoot=Ubrpc"
+                ,"--ubrpc.app.id=app1",
+                "--ubrpc.app.namespace=public",
+                "--ubrpc.app.env=dev",
+                "--ubrpc.provider.metas.dc=bj",
+                "--ubrpc.provider.metas.gray=false",
+                "--ubrpc.provider.metas.unit=B001");
 
     }
 

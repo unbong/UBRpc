@@ -4,11 +4,16 @@ ubrpc:
   zkServer: localhost:2182
   zkRoot: Ubrpc
 
+  app:
+    id: app1
+    namespace: public
+    env: test
+  provider:
+    metas:
+      dc: bj
+      gray: false
+      unit: B001
 
-app:
-  id: app1
-  namespace: public
-  env: dev
 
 logging:
   level:
