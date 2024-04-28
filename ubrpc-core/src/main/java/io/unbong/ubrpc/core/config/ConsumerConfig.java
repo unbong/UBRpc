@@ -1,7 +1,8 @@
-package io.unbong.ubrpc.core.consumer;
+package io.unbong.ubrpc.core.config;
 
 import io.unbong.ubrpc.core.api.*;
 import io.unbong.ubrpc.core.cluster.GrayRouter;
+import io.unbong.ubrpc.core.consumer.ConsumerBootStrap;
 import io.unbong.ubrpc.core.filter.CacheFilter;
 import io.unbong.ubrpc.core.filter.ParameterFilter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 
 import java.util.List;
@@ -24,36 +26,42 @@ import java.util.List;
  */
 @Configuration
 @Slf4j
+@Import({AppConfigProperties.class,ConsumerConfigurationProperties.class})
 public class ConsumerConfig {
 
 //    @Value("${ubrpc.providers}")
 //    String servers;
+//
+//    @Value("${app.grayRatio:0}")
+//    private int grayRatio;
+//
+//
+//    @Value("${app.id:app1}")
+//    private String app;
+//    @Value("${app.namespace:public}")
+//    private String namespace;
+//    @Value("${app.env:dev}")
+//    private String env;
+//
+//    @Value("${app.retries:1}")
+//    private String retries;
+//
+//    @Value("${app.timeout:1000}")
+//    private String timeout;
+//
+//    @Value("${app.faultLimit:10}")
+//    private int faultLimit;
+//
+//    @Value("${app.halfOpenInitialDelay:10000}")
+//    private int halfOpenInitialDelay;
+//
+//    @Value("${app.halfOpenDelay:60000}")
+//    private int halfOpenDelay;
+    @Autowired
+    AppConfigProperties appConfigProperties;
 
-    @Value("${app.grayRatio:0}")
-    private int grayRatio;
-
-
-    @Value("${app.id:app1}")
-    private String app;
-    @Value("${app.namespace:public}")
-    private String namespace;
-    @Value("${app.env:dev}")
-    private String env;
-
-    @Value("${app.retries:1}")
-    private String retries;
-
-    @Value("${app.timeout:1000}")
-    private String timeout;
-
-    @Value("${app.faultLimit:10}")
-    private int faultLimit;
-
-    @Value("${app.halfOpenInitialDelay:10000}")
-    private int halfOpenInitialDelay;
-
-    @Value("${app.halfOpenDelay:60000}")
-    private int halfOpenDelay;
+    @Autowired
+    ConsumerConfigurationProperties consumerConfigProperties;
 
     @Bean
     public ConsumerBootStrap createConsumerBootStrap(){
@@ -113,7 +121,7 @@ public class ConsumerConfig {
      */
     @Bean
     public Router<InstanceMeta> router(){
-        return new GrayRouter(grayRatio);
+        return new GrayRouter(consumerConfigProperties.getGrayRatio());
     }
 
     /**
@@ -142,14 +150,14 @@ public class ConsumerConfig {
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
-        context.getParameters().put("app.id", app);
-        context.getParameters().put("app.namespace", namespace);
-        context.getParameters().put("app.env", env);
-        context.getParameters().put("app.retries", String.valueOf(retries));
-        context.getParameters().put("app.timeout", String.valueOf(timeout));
-        context.getParameters().put("app.halfOpenInitialDelay", String.valueOf(halfOpenInitialDelay));
-        context.getParameters().put("app.faultLimit", String.valueOf(faultLimit));
-        context.getParameters().put("app.halfOpenDelay", String.valueOf(halfOpenDelay));
+        context.getParameters().put("app.id", appConfigProperties.getId());
+        context.getParameters().put("app.namespace", appConfigProperties.getNamespace());
+        context.getParameters().put("app.env", appConfigProperties.getEnv());
+        context.getParameters().put("consumer.retries", String.valueOf(consumerConfigProperties.getRetries()));
+        context.getParameters().put("consumer.timeout", String.valueOf(consumerConfigProperties.getTimeout()));
+        context.getParameters().put("consumer.halfOpenInitialDelay", String.valueOf(consumerConfigProperties.getHalfOpenInitialDelay()));
+        context.getParameters().put("consumer.faultLimit", String.valueOf(consumerConfigProperties.getFaultLimit()));
+        context.getParameters().put("consumer.halfOpenDelay", String.valueOf(consumerConfigProperties.getHalfOpenDelay()));
         return context;
     }
 }

@@ -1,6 +1,8 @@
-package io.unbong.ubrpc.core.provider;
+package io.unbong.ubrpc.core.config;
 
 import io.unbong.ubrpc.core.api.RegistryCenter;
+import io.unbong.ubrpc.core.provider.ProviderBootStrap;
+import io.unbong.ubrpc.core.provider.ProviderInvoker;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
 import io.unbong.ubrpc.core.trasport.SpringTransport;
 import lombok.extern.slf4j.Slf4j;
@@ -22,25 +24,31 @@ import java.util.Map;
 
 @Configuration
 @Slf4j
-@Import({SpringTransport.class})
+@Import({AppConfigProperties.class,ProviderConfigurationProperties.class,SpringTransport.class})
 public class ProviderConfig {
 
 
     @Value("${server.port:8080}")
     private String port;
-    @Value("${app.id:app1}")
-    private String app;
-    @Value("${app.namespace:public}")
-    private String namespace;
-    @Value("${app.env:dev}")
-    private String env;
-    @Value("#{${app.metas:{dc:'bj',gray:'false',unit:'B001'}}}")       //spel
-    Map<String, String> metas;
+//    @Value("${app.id:app1}")
+//    private String app;
+//    @Value("${app.namespace:public}")
+//    private String namespace;
+//    @Value("${app.env:dev}")
+//    private String env;
+//    @Value("#{${app.metas:{dc:'bj',gray:'false',unit:'B001'}}}")       //spel
+//    Map<String, String> metas;
+
+    @Autowired
+    AppConfigProperties appConfigProperties;
+
+    @Autowired
+    ProviderConfigurationProperties providerConfigurationProperties;
 
     @Bean
     public ProviderBootStrap boot()
     {
-        return new ProviderBootStrap(port, app, namespace, env, metas);
+        return new ProviderBootStrap(port, appConfigProperties, providerConfigurationProperties);
     }
 
     /**

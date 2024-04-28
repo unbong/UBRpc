@@ -49,10 +49,14 @@ public class UBInvocationHandler implements InvocationHandler {
         this.service = clazz;
         _context = context;
         _providers = providers;
-        int timeout = Integer.valueOf(context.getParameters().getOrDefault("app.timeout", "1000"));
+        int timeout = Integer.valueOf(context.getParameters().getOrDefault("consumer.timeout", "1000"));
         _httpInvoker = new OkHttpInvoker(timeout);
         _executor = Executors.newScheduledThreadPool(1);
-        _executor.scheduleWithFixedDelay(this::halfOpen, 10, 60, TimeUnit.SECONDS);
+        int halfOpenInitialDelay = Integer.parseInt(context.getParameters()
+                .getOrDefault("consumer.halfOpenInitialDelay", "10000"));
+        int halfOpenDelay = Integer.parseInt(context.getParameters()
+                .getOrDefault("consumer.halfOpenDelay", "60000"));
+        _executor.scheduleWithFixedDelay(this::halfOpen, halfOpenInitialDelay, halfOpenDelay, TimeUnit.MILLISECONDS);
     }
 
     private void halfOpen() {
@@ -81,8 +85,9 @@ public class UBInvocationHandler implements InvocationHandler {
         rpcRequest.setArgs(args);
         // rpcRequest.setParameters(_context.getParamaters());
 
-        int retries = Integer.valueOf( _context.getParameters().getOrDefault("app.retries", "1"));
-
+        int retries = Integer.valueOf( _context.getParameters().getOrDefault("consumer.retries", "1"));
+        int faultLimit = Integer.parseInt(_context.getParameters()
+                .getOrDefault("consumer.faultLimit", "10"));
         while(retries-- > 0)
         {
             log.info("---> retries: " + retries );
@@ -137,7 +142,7 @@ public class UBInvocationHandler implements InvocationHandler {
                     window.record(System.currentTimeMillis());
                     log.debug("instance {} in window with {*", url, window.getSum());
                     // 30s内发生了10次  就故障隔离
-                    if(window.getSum() >= 10)
+                    if(window.getSum() >= faultLimit)
                     {
                         isolate(instance);
                     }

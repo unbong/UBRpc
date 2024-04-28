@@ -4,7 +4,7 @@ import io.unbong.ubrpc.core.annotation.UBConsumer;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.api.RpcContext;
 import io.unbong.ubrpc.core.cluster.GrayRouter;
-import io.unbong.ubrpc.core.consumer.ConsumerConfig;
+import io.unbong.ubrpc.core.config.ConsumerConfig;
 import io.unbong.ubrpc.demo.api.User;
 import io.unbong.ubrpc.demo.api.UserService;
 import lombok.extern.slf4j.Slf4j;

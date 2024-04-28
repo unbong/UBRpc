@@ -2,6 +2,8 @@ package io.unbong.ubrpc.core.provider;
 
 import io.unbong.ubrpc.core.annotation.UbProvider;
 import io.unbong.ubrpc.core.api.RegistryCenter;
+import io.unbong.ubrpc.core.config.AppConfigProperties;
+import io.unbong.ubrpc.core.config.ProviderConfigurationProperties;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
 import io.unbong.ubrpc.core.meta.ProviderMeta;
 import io.unbong.ubrpc.core.meta.ServiceMeta;
@@ -38,23 +40,23 @@ public class ProviderBootStrap implements ApplicationContextAware {
 
     private ApplicationContext _applicationContext ;
     private String port;
-    private String app;
-    private String namespace;
-    private String env;
-    private Map<String, String> metas;
+//    private String app;
+//    private String namespace;
+//    private String env;
+
+    private AppConfigProperties appConfigProperties;
+    private ProviderConfigurationProperties providerConfigurationProperties;
+//    private Map<String, String> metas;
 
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
     private InstanceMeta _instance;
 
     RegistryCenter rc;
 
-    public ProviderBootStrap(String port, String app, String namespace,
-                             String env, Map<String, String> metas) {
+    public ProviderBootStrap(String port, AppConfigProperties appConfigProperties, ProviderConfigurationProperties providerConfigurationProperties) {
         this.port = port;
-        this.app = app;
-        this.namespace = namespace;
-        this.env = env;
-        this.metas = metas;
+        this.appConfigProperties = appConfigProperties;
+        this.providerConfigurationProperties = providerConfigurationProperties;
     }
 
     @Override
@@ -72,7 +74,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
         // ip and port
         String ip = InetAddress.getLocalHost().getHostAddress();
         this._instance =InstanceMeta.http(ip, Integer.valueOf(port));
-        this._instance.getParameters().putAll(this.metas);
+        this._instance.getParameters().putAll(this.providerConfigurationProperties.getMetas());
         rc.start();
         // 注册服务列表
         skeleton.keySet().forEach(this::registerService);
@@ -89,9 +91,9 @@ public class ProviderBootStrap implements ApplicationContextAware {
     private void unregisterService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(service)
-                .app(this.app)
-                .namespace(this.namespace)
-                .env(this.env)
+                .app(this.appConfigProperties.getId())
+                .namespace(this.appConfigProperties.getNamespace())
+                .env(this.appConfigProperties.getEnv())
                 .build();
 
         rc.unregister(serviceMeta, _instance);
@@ -119,9 +121,9 @@ public class ProviderBootStrap implements ApplicationContextAware {
     private void registerService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(service)
-                .app(this.app)
-                .namespace(this.namespace)
-                .env(this.env)
+                .app(this.appConfigProperties.getId())
+                .namespace(this.appConfigProperties.getNamespace())
+                .env(this.appConfigProperties.getEnv())
                 .build();
 
         rc.register(serviceMeta, _instance);

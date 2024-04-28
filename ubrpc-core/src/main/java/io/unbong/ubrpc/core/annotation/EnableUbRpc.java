@@ -1,7 +1,7 @@
 package io.unbong.ubrpc.core.annotation;
 
-import io.unbong.ubrpc.core.consumer.ConsumerConfig;
-import io.unbong.ubrpc.core.provider.ProviderConfig;
+import io.unbong.ubrpc.core.config.ConsumerConfig;
+import io.unbong.ubrpc.core.config.ProviderConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
