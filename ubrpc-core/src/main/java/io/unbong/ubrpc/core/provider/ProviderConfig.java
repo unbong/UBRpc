@@ -26,15 +26,15 @@ import java.util.Map;
 public class ProviderConfig {
 
 
-    @Value("${server.port}")
+    @Value("${server.port:8080}")
     private String port;
-    @Value("${app.id}")
+    @Value("${app.id:app1}")
     private String app;
-    @Value("${app.namespace}")
+    @Value("${app.namespace:public}")
     private String namespace;
-    @Value("${app.env}")
+    @Value("${app.env:dev}")
     private String env;
-    @Value("#{${app.metas}}")       //spel
+    @Value("#{${app.metas:{dc:'bj',gray:'false',unit:'B001'}}}")       //spel
     Map<String, String> metas;
 
     @Bean

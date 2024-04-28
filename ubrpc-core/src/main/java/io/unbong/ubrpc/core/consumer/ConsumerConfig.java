@@ -26,8 +26,8 @@ import java.util.List;
 @Slf4j
 public class ConsumerConfig {
 
-    @Value("${ubrpc.providers}")
-    String servers;
+//    @Value("${ubrpc.providers}")
+//    String servers;
 
     @Value("${app.grayRatio:0}")
     private int grayRatio;
