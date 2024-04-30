@@ -12,6 +12,7 @@ ubrpc:
       dc: bj
       gray: false
       unit: B001
+      tc: 20
 
 
 logging:

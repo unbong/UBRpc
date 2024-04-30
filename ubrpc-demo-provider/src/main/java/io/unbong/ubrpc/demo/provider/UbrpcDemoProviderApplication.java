@@ -1,5 +1,6 @@
 package io.unbong.ubrpc.demo.provider;
 
+import io.unbong.ubrpc.core.api.RpcException;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
 import io.unbong.ubrpc.core.config.ProviderConfig;
@@ -68,6 +69,19 @@ public class UbrpcDemoProviderApplication {
             RpcResponse<Object> rpcResponse1 = transport.invoke(request1);
             log.info("return : "+rpcResponse1.getData());
 
+
+            for (int i = 0; i < 1000; i++) {
+                try {
+                    Thread.sleep(1000);
+                    RpcResponse<Object> r = transport.invoke(request);
+                    System.out.println(i + " ***>>> " +r.getData());
+                } catch (RpcException e) {
+                    // ignore
+                    System.out.println(i + " ***>>> " +e.getMessage() + " -> " + e.getErrorCode());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         };
     }
 //    @Autowired

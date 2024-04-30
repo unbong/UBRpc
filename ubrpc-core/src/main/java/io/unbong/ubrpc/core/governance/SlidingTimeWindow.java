@@ -1,6 +1,7 @@
 package io.unbong.ubrpc.core.governance;
 
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Description
@@ -8,6 +9,7 @@ import lombok.ToString;
  * @author <a href="ecunbong@gmail.com">unbong</a>
  * 2024-03-31 12:21
  */
+@Slf4j
 @ToString
 public class SlidingTimeWindow {
 
@@ -32,6 +34,27 @@ public class SlidingTimeWindow {
     public SlidingTimeWindow(int _size) {
         this.size = _size;
         this.ringBuffer = new RingBuffer(this.size);
+    }
+
+
+    public int calcSum(){
+        long ts = System.currentTimeMillis() /1000;
+
+        if(ts > _curr_ts && ts < _curr_ts +size)
+        {
+            int offset = (int) (ts-_curr_ts);
+            log.debug("calc sum for window ts:" + ts + ", curr_ts:" + _curr_ts + ", size:" + size + ", offset:" + offset);
+            this.ringBuffer.reset(_curr_mark+1, offset);
+            this._curr_ts = ts;
+            this._curr_mark = (_curr_mark+offset) % size;
+        }
+        else if(ts >= _curr_ts + size){
+            log.debug("calc sum for window ts:" + ts + ", curr_ts:" + _curr_ts + ", size:" + size);
+            this.ringBuffer.reset();
+            initRing(ts);
+        }
+        log.debug("calc sum for window:" + this);
+        return ringBuffer.sum();
     }
 
     /**

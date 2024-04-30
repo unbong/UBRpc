@@ -4,12 +4,15 @@ import io.unbong.ubrpc.core.api.RpcContext;
 import io.unbong.ubrpc.core.api.RpcException;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
+import io.unbong.ubrpc.core.governance.SlidingTimeWindow;
 import io.unbong.ubrpc.core.meta.ProviderMeta;
 import io.unbong.ubrpc.core.util.TypeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +23,7 @@ import java.util.Optional;
  * @author <a href="ecunbong@gmail.com">unbong</a>
  * 2024-03-21 22:01
  */
+@Slf4j
 public class ProviderInvoker {
 
     private MultiValueMap<String, ProviderMeta> skeleton;
@@ -28,12 +32,32 @@ public class ProviderInvoker {
         this.skeleton = providerBootStrap.getSkeleton();
     }
 
+    private int tpsLimit = 20;
+
+    final Map<String, SlidingTimeWindow> windows = new HashMap<>();
+
     public RpcResponse<Object> invoke(RpcRequest request)
     {
 
         RpcResponse<Object> rpcResponse = new  RpcResponse<>();
+
+        String service = request.getService();
+        // trafic control
+        synchronized (windows){
+            SlidingTimeWindow window = windows.computeIfAbsent(service,  k->new SlidingTimeWindow());
+
+            if( window.calcSum() > tpsLimit){
+                log.debug("service: {} exceed tpslimit {}", service,tpsLimit);
+                throw new RpcException("service" + service + "invoked in " +window.getSize() +"s " +
+                        "[" + window.getSum() +"] larger than tpsLimit " + tpsLimit );
+            }
+
+            window.record(System.currentTimeMillis());
+            log.debug("service {} in window with {}", service, window.getSum());
+        }
+
+
         // 在skeleton中找到 对应的bean
-//        Object bean = skeleton.get(request.getService());
         List<ProviderMeta> providerMetas = skeleton.get(request.getService());
 
         //
