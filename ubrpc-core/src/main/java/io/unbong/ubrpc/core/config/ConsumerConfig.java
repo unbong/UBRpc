@@ -6,6 +6,7 @@ import io.unbong.ubrpc.core.consumer.ConsumerBootStrap;
 import io.unbong.ubrpc.core.filter.CacheFilter;
 import io.unbong.ubrpc.core.filter.ParameterFilter;
 import io.unbong.ubrpc.core.meta.InstanceMeta;
+import io.unbong.ubrpc.core.registry.ub.UbRegistryCenter;
 import io.unbong.ubrpc.core.registry.zk.ZKRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +131,9 @@ public class ConsumerConfig {
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter comsumer_rc(){
-        return new ZKRegistryCenter();
+
+        //return new ZKRegistryCenter();
+        return new UbRegistryCenter();
     }
 
 

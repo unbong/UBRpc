@@ -15,7 +15,22 @@ ubrpc:
       tc: 20
 
 
+
 logging:
   level:
     root: info
     io.unbong: debug
+apollo:
+  cache-dir: /opt/data/
+  cluster: default
+  meta: http://localhost:8080
+  autoUpdateInjectedSpringProperties: true
+  bootstrap:
+    enabled: true
+    namespaces: app3
+    eagerLoad:
+      enabled: false
+
+
+ubregistry:
+  servers: http://localhost:8484
