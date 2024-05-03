@@ -1,4 +1,4 @@
-package io.unbong.ubrpc.core.provider;
+package io.unbong.ubrpc.core.config;
 
 import io.unbong.ubrpc.core.api.RegistryCenter;
 import io.unbong.ubrpc.core.provider.ProviderBootStrap;
