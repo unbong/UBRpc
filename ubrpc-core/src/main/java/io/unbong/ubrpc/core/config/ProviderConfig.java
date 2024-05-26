@@ -29,8 +29,8 @@ import java.util.Map;
 public class ProviderConfig {
 
 
-    @Value("${server.port:8080}")
-    private String port;
+    @Value("${server.port}")
+    private String port ;
 //    @Value("${app.id:app1}")
 //    private String app;
 //    @Value("${app.namespace:public}")

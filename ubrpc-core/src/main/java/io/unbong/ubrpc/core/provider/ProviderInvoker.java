@@ -4,6 +4,7 @@ import io.unbong.ubrpc.core.api.RpcContext;
 import io.unbong.ubrpc.core.api.RpcException;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
+import io.unbong.ubrpc.core.config.ProviderConfigurationProperties;
 import io.unbong.ubrpc.core.governance.SlidingTimeWindow;
 import io.unbong.ubrpc.core.meta.ProviderMeta;
 import io.unbong.ubrpc.core.util.TypeUtils;
@@ -28,11 +29,14 @@ public class ProviderInvoker {
 
     private MultiValueMap<String, ProviderMeta> skeleton;
 
+    private ProviderConfigurationProperties providerConfigurationProperties;
+
     public ProviderInvoker(ProviderBootStrap providerBootStrap) {
         this.skeleton = providerBootStrap.getSkeleton();
+        this.providerConfigurationProperties = providerBootStrap.getProviderConfigurationProperties();
     }
 
-    private int tpsLimit = 20;
+//    private int tpsLimit = 20;
 
     final Map<String, SlidingTimeWindow> windows = new HashMap<>();
 
@@ -40,7 +44,7 @@ public class ProviderInvoker {
     {
 
         RpcResponse<Object> rpcResponse = new  RpcResponse<>();
-
+        int tpsLimit = Integer.parseInt(this.providerConfigurationProperties.getMetas().getOrDefault("tc", "20"));
         String service = request.getService();
         // trafic control
         synchronized (windows){

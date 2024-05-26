@@ -1,8 +1,5 @@
 package io.unbong.ubrpc.core.config;
 
-import com.ctrip.framework.apollo.model.ConfigChange;
-import com.ctrip.framework.apollo.model.ConfigChangeEvent;
-import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
@@ -23,14 +20,14 @@ public class ApolloChangedListener implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    @ApolloConfigChangeListener({"app1", "application"})
-    private void changeHandler(ConfigChangeEvent changeEvent){
-        for(String key: changeEvent.changedKeys()){
-            ConfigChange change = changeEvent.getChange(key);
-            log.info("found change -> {}", change.toString());
-        }
-
-        // 更新相应的Bean属性值，主要是存在@ConfigurationProperties注解的bean
-        this.applicationContext.publishEvent(new EnvironmentChangeEvent(changeEvent.changedKeys()));
-    }
+//    @ApolloConfigChangeListener({"app3", "application"})
+//    private void changeHandler(ConfigChangeEvent changeEvent){
+//        for(String key: changeEvent.changedKeys()){
+//            ConfigChange change = changeEvent.getChange(key);
+//            log.info("found change -> {}", change.toString());
+//        }
+//
+//        // 更新相应的Bean属性值，主要是存在@ConfigurationProperties注解的bean
+//        this.applicationContext.publishEvent(new EnvironmentChangeEvent(changeEvent.changedKeys()));
+//    }
 }

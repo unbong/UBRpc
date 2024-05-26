@@ -39,9 +39,6 @@ public class ProviderBootStrap implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
     private String port;
-//    private String app;
-//    private String namespace;
-//    private String env;
 
     private AppConfigProperties appConfigProperties;
     private ProviderConfigurationProperties providerConfigurationProperties;
@@ -75,7 +72,7 @@ public class ProviderBootStrap implements ApplicationContextAware {
         this._instance =InstanceMeta.http(ip, Integer.valueOf(port));
         this._instance.getParameters().putAll(this.providerConfigurationProperties.getMetas());
         rc.start();
-        // 注册服务列表
+        // 注册服务列表∂Ω
         skeleton.keySet().forEach(this::registerService);
 
 

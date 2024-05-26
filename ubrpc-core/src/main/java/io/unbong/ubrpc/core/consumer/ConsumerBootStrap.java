@@ -10,7 +10,6 @@ import io.unbong.ubrpc.core.util.MethodUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
@@ -32,12 +31,12 @@ import java.util.Map;
 @Slf4j
 public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAware {
 
-    ApplicationContext _applicatoinContext ;
+    ApplicationContext applicationContext;
     Environment _environment;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        _applicatoinContext = applicationContext;
+        this.applicationContext = applicationContext;
     }
 
     private Map<String, Object> stub = new HashMap<>();
@@ -48,13 +47,13 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
      */
     public void start(){
 
-        Router<InstanceMeta> router = _applicatoinContext.getBean(Router.class);
-        LoadBalancer<InstanceMeta> loadBalancer = _applicatoinContext.getBean(LoadBalancer.class);
-        RegistryCenter rc = _applicatoinContext.getBean(RegistryCenter.class);
-        List<Filter> filters  = _applicatoinContext.getBeansOfType(Filter.class).
+        Router<InstanceMeta> router = applicationContext.getBean(Router.class);
+        LoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(LoadBalancer.class);
+        RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+        List<Filter> filters  = applicationContext.getBeansOfType(Filter.class).
                         values().stream().toList();
 
-        RpcContext context = _applicatoinContext.getBean(RpcContext.class);
+        RpcContext context = applicationContext.getBean(RpcContext.class);
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
@@ -62,9 +61,9 @@ public class ConsumerBootStrap implements ApplicationContextAware, EnvironmentAw
 //        context.getParameters().put("app.timeout",timeout);
 //        context.getParameters().put("app.retries", retries);
 
-        String[] names = _applicatoinContext.getBeanDefinitionNames();
+        String[] names = applicationContext.getBeanDefinitionNames();
         for(String name : names){
-            Object bean = _applicatoinContext.getBean(name);
+            Object bean = applicationContext.getBean(name);
             List<Field> fields = MethodUtil.findAnnotatedField(bean.getClass(), UBConsumer.class);
 
             if(!name.contains("ubrpcDemoConsumerApplication")) continue;

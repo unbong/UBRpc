@@ -1,9 +1,10 @@
 package io.unbong.ubrpc.demo.provider;
 
-import io.unbong.ubrpc.core.api.RpcException;
+import io.unbong.ubconfig.client.annotation.EnableUbConfig;
 import io.unbong.ubrpc.core.api.RpcRequest;
 import io.unbong.ubrpc.core.api.RpcResponse;
 import io.unbong.ubrpc.core.config.ProviderConfig;
+import io.unbong.ubrpc.core.config.ProviderConfigurationProperties;
 import io.unbong.ubrpc.core.trasport.SpringTransport;
 import io.unbong.ubrpc.demo.api.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * todo
  *
@@ -26,8 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @Import({ProviderConfig.class})
+@EnableUbConfig
+//@EnableApolloConfig
 @Slf4j
 public class UbrpcDemoProviderApplication {
+
+//    @Bean
+//    ApolloChangedListener apolloChangedListener() {
+//        return new ApolloChangedListener();
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(UbrpcDemoProviderApplication.class, args);
@@ -38,6 +48,9 @@ public class UbrpcDemoProviderApplication {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    ProviderConfigurationProperties providerConfigurationProperties ;
     @RequestMapping("/ports")
     public RpcResponse<String> ports(@RequestParam("ports") String ports)
     {
@@ -46,6 +59,13 @@ public class UbrpcDemoProviderApplication {
         response.setStatus(true);
         response.setData("ok: "+ ports);
         return response;
+    }
+
+    @RequestMapping("/meta")
+    public String meta(){
+        Map<String, String> metas =providerConfigurationProperties.getMetas();
+        log.debug("metas hashcode " + metas.hashCode());
+        return metas.toString();
     }
 
     @Bean

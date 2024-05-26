@@ -1,5 +1,6 @@
 package io.unbong.ubrpcdemoconsumer;
 
+import io.unbong.ubconfig.client.annotation.EnableUbConfig;
 import io.unbong.ubrpc.core.annotation.UBConsumer;
 import io.unbong.ubrpc.core.api.Router;
 import io.unbong.ubrpc.core.api.RpcContext;
@@ -14,6 +15,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,8 @@ import java.util.*;
 @SpringBootApplication
 @Import({ConsumerConfig.class})
 @RestController
+@EnableUbConfig
+//@EnableApolloConfig
 @Slf4j
 public class UbrpcDemoConsumerApplication {
 
@@ -31,6 +35,9 @@ public class UbrpcDemoConsumerApplication {
 
     @Autowired
     Router router;
+
+    @Autowired
+    Environment environment;
 
     @RequestMapping("/")
     public User invoke(@RequestParam("id")int id){
@@ -47,6 +54,12 @@ public class UbrpcDemoConsumerApplication {
     public User find(@RequestParam("timeout") String timeout){
 
         return userService.findTw(Integer.valueOf(timeout).intValue());
+    }
+
+    @RequestMapping("/meta")
+    public String meta(){
+
+        return environment.getProperty("ubrpc.provider.metas.tc");
     }
 
 
